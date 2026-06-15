@@ -7,8 +7,8 @@
   const photosPerNumber = 4;
 
   // --- CONFIGURACIÓN DEL CARRITO ---
-  const WHATSAPP_NUMBER = '5491100000000'; // Reemplazar con el número real de la tienda (ej: 54911xxxxxxxx)
-  const PHOTO_PRICE = 1500; // Precio de cada foto en ARS
+  const WHATSAPP_NUMBER = '5493412524472'; // Formato internacional: Código de país (54) + Celular (9) + Código de área (341) + Número
+  const PHOTO_PRICE = 4000; // Precio de cada foto en ARS
   const MP_BACKEND_URL = ''; // URL de tu backend para generar la preferencia (dejar vacío para usar WhatsApp checkout)
 
   // --- ESTADO DEL CARRITO ---
