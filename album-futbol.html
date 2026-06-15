@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Album Futbol Infantil - Estudio El Oso</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="album-page">
+  <header class="album-topbar">
+    <div class="album-brand">Estudio El Oso / Futbol infantil</div>
+    <a class="album-back" href="index.html">Volver</a>
+  </header>
+
+  <main class="album-shell">
+    <div class="album-kicker">Album por camiseta</div>
+    <h1 class="album-title">Futbol<br><em>infantil.</em></h1>
+    <p class="album-intro">Elegí la categoría y buscá el número de camiseta. Cada familia puede encontrar rápidamente las fotos donde aparece su hijo.</p>
+
+    <section class="album-controls" aria-label="Filtros del album">
+      <div class="album-tabs" role="tablist" aria-label="Categorias">
+        <button class="album-tab is-active" type="button" data-category="2020">Categoria 2020</button>
+        <button class="album-tab" type="button" data-category="2019">Categoria 2019</button>
+      </div>
+      <div class="album-search">
+        <label for="numberSearch">Buscar numero de camiseta</label>
+        <input id="numberSearch" type="search" inputmode="numeric" placeholder="Ej: 10" autocomplete="off" />
+      </div>
+    </section>
+
+    <div class="album-results-head">
+      <span id="albumStatus">Categoria 2020 - todos los numeros</span>
+      <span id="albumCount"></span>
+    </div>
+
+    <section class="album-grid" id="albumGrid" aria-live="polite"></section>
+    <div class="album-empty" id="albumEmpty">No encontramos fotos para ese numero en esta categoria.</div>
+  </main>
+
+  <script src="js/album-futbol.js" defer></script>
+</body>
+</html>
