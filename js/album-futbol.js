@@ -9,7 +9,7 @@
   // --- CONFIGURACIÓN DEL CARRITO ---
   const WHATSAPP_NUMBER = '5493412524472'; // Formato internacional: Código de país (54) + Celular (9) + Código de área (341) + Número
   const PHOTO_PRICE = 4000; // Precio de cada foto en ARS
-  const MP_BACKEND_URL = ''; // URL de tu backend para generar la preferencia (dejar vacío para usar WhatsApp checkout)
+  const MP_BACKEND_URL = '/create-preference'; // Cloudflare Pages Function
 
   // --- ESTADO DEL CARRITO ---
   let cart = [];
