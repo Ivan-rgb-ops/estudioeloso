@@ -289,56 +289,207 @@ pupil.position.z = .02; DIAPHRAGM.add(pupil);
 const irisRim = mkTorus(.185, .012, new THREE.MeshStandardMaterial({ color: 0x5a5a66, metalness: .95, roughness: .08 }));
 irisRim.position.z = .03; DIAPHRAGM.add(irisRim);
 
-/* ── Input state ── */
-let scrollProgress = 0, scrollTarget = 0;
-let mouse = { x: 0, y: 0 };
+/* ── GSAP & ScrollTrigger Setup ── */
+const gsap = window.gsap;
+const ScrollTrigger = window.ScrollTrigger;
+if (gsap && ScrollTrigger) {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
-window.addEventListener('scroll', () => {
-  const trackHeight = document.getElementById('scroll-track').offsetHeight;
-  scrollTarget = trackHeight > 0 ? Math.min(scrollY / trackHeight, 1) : 0;
-}, { passive: true });
+/* ── Animation State (Driven by GSAP ScrollTrigger) ── */
+const anim = {
+  p: 0,
+  camZ: 4.2,
+  camY: 0,
+  lensRotY: 0,
+  lensRotX: 0,
+  diaphragmScale: 1,
+  diaphragmRot: 0,
+  blueIntensity: 2.2,
+  goldIntensity: 1.5,
+  rimIntensity: 0.5
+};
+
+/* ── UI Element References ── */
+const elBrand = document.getElementById('brand');
+const elNav = document.getElementById('nav');
+const elHero = document.getElementById('hero');
+const elHeroH1 = elHero ? elHero.querySelector('h1') : null;
+const elHeroP = elHero ? elHero.querySelector('p') : null;
+const elHint = elHero ? elHero.querySelector('.hint') : null;
+const elSI = document.getElementById('si');
+if (elSI) elSI.style.display = 'none';
+const elST = document.getElementById('st');
+const elSS = document.getElementById('ss');
+const elTG = document.getElementById('tg');
+const elBAR = document.getElementById('bar');
+const elARR = document.getElementById('arr');
+const scrollTrack = document.getElementById('scroll-track');
+
+/* ── Mouse Tilt with GSAP quickTo for silky weight ── */
+let mouse = { x: 0, y: 0 };
+let quickRotX = null;
+let quickRotY = null;
+
+if (gsap) {
+  quickRotX = gsap.quickTo(ROOT.rotation, 'x', { duration: 0.8, ease: 'power2.out' });
+  quickRotY = gsap.quickTo(ROOT.rotation, 'y', { duration: 0.8, ease: 'power2.out' });
+}
 
 window.addEventListener('mousemove', e => {
-  mouse.x =  (e.clientX / innerWidth  - .5) * 2;
+  mouse.x = (e.clientX / innerWidth - .5) * 2;
   mouse.y = -(e.clientY / innerHeight - .5) * 2;
-});
+  if (quickRotX && quickRotY) {
+    quickRotX(-mouse.y * 0.12);
+    quickRotY(mouse.x * 0.12);
+  }
+}, { passive: true });
 
 window.addEventListener('touchmove', e => {
   const t = e.touches[0];
-  mouse.x =  (t.clientX / innerWidth  - .5) * 2;
+  mouse.x = (t.clientX / innerWidth - .5) * 2;
   mouse.y = -(t.clientY / innerHeight - .5) * 2;
+  if (quickRotX && quickRotY) {
+    quickRotX(-mouse.y * 0.12);
+    quickRotY(mouse.x * 0.12);
+  }
 }, { passive: true });
 
 window.addEventListener('resize', () => {
   camera.aspect = innerWidth / innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight);
+  if (ScrollTrigger) {
+    ScrollTrigger.refresh();
+  }
 });
 
-/* ── UI element references ── */
-const elBrand  = document.getElementById('brand');
-const elNav    = document.getElementById('nav');
-const elHero   = document.getElementById('hero');
-const elHeroH1 = elHero.querySelector('h1');
-const elHeroP  = elHero.querySelector('p');
-const elHint   = elHero.querySelector('.hint');
-const elSI     = document.getElementById('si');
-if (elSI) elSI.style.display = 'none';
-const elST     = document.getElementById('st');
-const elSS     = document.getElementById('ss');
-const elTG     = document.getElementById('tg');
-const elBAR    = document.getElementById('bar');
-const elARR    = document.getElementById('arr');
+/* ── Entrance Animation ── */
+if (gsap) {
+  const introTl = gsap.timeline({ delay: 0.15 });
+  const eyebrow = elHero ? elHero.querySelector('.eyebrow') : null;
+  if (eyebrow) {
+    introTl.fromTo(eyebrow, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' });
+  }
+  if (elHeroH1) {
+    introTl.fromTo(elHeroH1, { opacity: 0, y: 26, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 1.1, ease: 'power3.out' }, '-=0.6');
+  }
+  if (elHeroP) {
+    introTl.fromTo(elHeroP, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out' }, '-=0.7');
+  }
+  if (elHint) {
+    const hintTargets = [elHint, elARR, elTG].filter(Boolean);
+    introTl.fromTo(hintTargets, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power2.out' }, '-=0.5');
+  }
+} else {
+  setTimeout(() => {
+    const eyebrow = elHero ? elHero.querySelector('.eyebrow') : null;
+    if (eyebrow) eyebrow.style.opacity = '1';
+    if (elHeroH1) { elHeroH1.style.opacity = '1'; elHeroH1.style.transform = 'translateY(0)'; }
+    if (elHeroP) elHeroP.style.opacity = '1';
+    if (elHint) elHint.style.opacity = '1';
+  }, 120);
+}
 
-/* ── Entrance animation ── */
-setTimeout(() => {
-  const eyebrow = elHero.querySelector('.eyebrow');
-  if (eyebrow) eyebrow.style.opacity = '1';
-  elHeroH1.style.opacity  = '1';
-  elHeroH1.style.transform = 'translateY(0)';
-  elHeroP.style.opacity   = '1';
-  elHint.style.opacity    = '1';
-}, 120);
+/* ── GSAP Scroll-Linked Scrubbing ── */
+if (gsap && ScrollTrigger && scrollTrack) {
+  const masterTl = gsap.timeline({
+    scrollTrigger: {
+      trigger: scrollTrack,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 1.2,
+      onUpdate: (self) => {
+        anim.p = self.progress;
+        if (elBAR) {
+          elBAR.style.width = (self.progress * 100) + '%';
+        }
+
+        const pct = Math.round(self.progress * 100);
+        if (elST && elSS && elTG) {
+          if (pct < 40) {
+            elST.textContent = 'ESTUDIO EL OSO'; elSS.textContent = 'Fotografía de eventos'; elTG.textContent = 'Scroll para acercarte';
+          } else if (pct < 75) {
+            elST.textContent = 'CADA MOMENTO'; elSS.textContent = 'Para siempre'; elTG.textContent = 'Estudio El Oso';
+          } else {
+            elST.textContent = 'EL MOMENTO'; elSS.textContent = 'Congelado para siempre'; elTG.textContent = 'Estudio El Oso';
+          }
+        }
+      }
+    }
+  });
+
+  // 1. Hero text smoothly lifts, scales, and fades away (0% to 26% of track)
+  if (elHero) {
+    masterTl.to(elHero, {
+      opacity: 0,
+      y: -50,
+      scale: 0.93,
+      ease: 'power2.inOut',
+      duration: 0.26
+    }, 0);
+  }
+
+  // 2. Scroll arrow and bottom hint fade out quickly (0% to 14%)
+  if (elARR) {
+    masterTl.to(elARR, { opacity: 0, y: 12, ease: 'power1.out', duration: 0.14 }, 0);
+  }
+  if (elTG) {
+    masterTl.to(elTG, { opacity: 0, y: 8, ease: 'power1.out', duration: 0.14 }, 0);
+  }
+
+  // 3. 3D Camera zooms smoothly with cinematic acceleration (0% to 100%)
+  masterTl.to(anim, {
+    camZ: 0.36,
+    lensRotY: Math.PI * 0.08,
+    lensRotX: -Math.PI * 0.04,
+    blueIntensity: 4.8,
+    goldIntensity: 4.0,
+    rimIntensity: 1.8,
+    diaphragmScale: 0.88,
+    ease: 'power2.inOut',
+    duration: 1.0
+  }, 0);
+
+  // 4. Header brand and navigation glide in seamlessly as zoom finishes (78% to 96%)
+  if (elBrand) {
+    masterTl.fromTo(elBrand, 
+      { opacity: 0, y: -16, visibility: 'hidden' }, 
+      {
+        opacity: 1,
+        y: 0,
+        visibility: 'visible',
+        ease: 'power2.out',
+        duration: 0.18,
+        onStart: () => { elBrand.style.visibility = 'visible'; },
+        onReverseComplete: () => { elBrand.style.visibility = 'hidden'; }
+      }, 
+      0.78
+    );
+  }
+
+  if (elNav) {
+    masterTl.fromTo(elNav, 
+      { opacity: 0, y: -16, visibility: 'hidden' }, 
+      {
+        opacity: 1,
+        y: 0,
+        visibility: 'visible',
+        ease: 'power2.out',
+        duration: 0.18,
+        onStart: () => { 
+          elNav.style.visibility = 'visible';
+          document.body.classList.add('show-header-blur');
+        },
+        onReverseComplete: () => { 
+          elNav.style.visibility = 'hidden';
+          document.body.classList.remove('show-header-blur');
+        }
+      }, 
+      0.80
+    );
+  }
+}
 
 /* ── Render loop ── */
 const clock = new THREE.Clock();
@@ -346,81 +497,42 @@ const clock = new THREE.Clock();
 function frame() {
   requestAnimationFrame(frame);
   const time = clock.getElapsedTime();
-  scrollProgress += (scrollTarget - scrollProgress) * .06;
-  const p    = scrollProgress;
-  const zoom = ease(clamp(remap(p, 0, 1, 0, 1), 0, 1));
 
-  // UI updates
-  elBAR.style.width  = (p * 100) + '%';
-  const showHeader = p > .92;
-  document.body.classList.toggle('show-header-blur', showHeader);
-  elBrand.style.opacity = showHeader ? '1' : '0';
-  elNav.style.opacity = showHeader ? '1' : '0';
-  elHero.style.opacity = p < .08 ? '1' : '0';
-  elARR.style.opacity  = p < .03 ? '1' : '0';
-  if (elSI) elSI.style.display = 'none';
+  if (gsap && ScrollTrigger) {
+    // Camera position driven by GSAP with subtle organic floating
+    camera.position.z = anim.camZ;
+    camera.position.y = Math.sin(time * 0.35) * 0.035 * (1 - anim.p * 0.7);
 
-  const pct = Math.round(p * 100);
-  if (pct < 50) {
-    elST.textContent = 'ESTUDIO EL OSO'; elSS.textContent = 'Fotografía de eventos'; elTG.textContent = 'Scroll para acercarte';
-  } else if (pct < 80) {
-    elST.textContent = 'CADA MOMENTO'; elSS.textContent = 'Para siempre'; elTG.textContent = 'Estudio El Oso';
+    // Lens pose from GSAP
+    LENS.rotation.y = anim.lensRotY;
+    LENS.rotation.x = anim.lensRotX;
+    LENS.position.y = Math.sin(time * 0.5) * 0.03 * (1 - anim.p * 0.8);
+
+    // Continuous mechanical micro-rotations
+    focusRing.rotation.z += 0.0022;
+    focusChrome.rotation.z -= 0.0016;
+    goldAccent.rotation.z += 0.0035;
+    DIAPHRAGM.rotation.z -= 0.0012;
+
+    // Diaphragm scale
+    DIAPHRAGM.scale.set(anim.diaphragmScale, anim.diaphragmScale, anim.diaphragmScale);
+
+    // Dynamic light intensities
+    blueLight.intensity = anim.blueIntensity;
+    goldLight.intensity = anim.goldIntensity;
+    rimLight.intensity = anim.rimIntensity;
   } else {
-    elST.textContent = 'EL MOMENTO'; elSS.textContent = 'Congelado para siempre'; elTG.textContent = 'Estudio El Oso';
+    // Fallback animation
+    camera.position.z = 4.2;
+    LENS.position.y = Math.sin(time * 0.5) * 0.04;
+    focusRing.rotation.z += 0.002;
+    goldAccent.rotation.z += 0.003;
   }
 
-  // Camera
-  camera.position.z = lerp(4.2, 0.35, zoom);
-  camera.position.y = lerp(0, .08, zoom) * Math.sin(time * .15);
-
-  // Mouse tilt
-  ROOT.rotation.x += ((-mouse.y * .12) - ROOT.rotation.x) * .05;
-  ROOT.rotation.y += ((mouse.x  * .12) - ROOT.rotation.y) * .05;
-
-  // Lens pose
-  LENS.rotation.y  = lerp(0, Math.PI * .08, zoom);
-  LENS.rotation.x  = lerp(0, -Math.PI * .04, zoom);
-  LENS.position.y  = Math.sin(time * .5) * .05 * lerp(1, 0.1, zoom);
-
-  // Continuous rotations
-  focusRing.rotation.z  += .003;
-  focusChrome.rotation.z -= .002;
-  goldAccent.rotation.z  += .005;
-  DIAPHRAGM.rotation.z   -= .0015;
-
-  // Light intensities
-  blueLight.intensity = lerp(2.2, 4.5, zoom);
-  goldLight.intensity = lerp(1.5, 3.8, zoom);
-  rimLight.intensity  = lerp(0.5, 1.8, zoom);
-
-  // Background palette cycling (only when fully zoomed)
-  if (p >= 0.99) {
-    paletteTimer += .016;
-    if (paletteTimer >= 3.5) {
-      paletteTimer  = 0;
-      paletteIndex  = paletteTarget;
-      paletteTarget = (paletteTarget + 1) % PALETTES.length;
-      paletteMix    = 0;
-    }
-    paletteMix = Math.min(paletteMix + .016 / 1.2, 1);
-    const t    = ease(paletteMix);
-    const from = PALETTES[paletteIndex], to = PALETTES[paletteTarget];
-    bgCurrent.lerpColors(from.bg, to.bg, t);
-    fogCurrent.lerpColors(from.fog, to.fog, t);
-    scene.background.copy(bgCurrent);
-    scene.fog.color.copy(fogCurrent);
-
-    const rv  = Math.round(bgCurrent.r * 255);
-    const gv  = Math.round(bgCurrent.g * 255);
-    const bv  = Math.round(bgCurrent.b * 255);
-    const css = `rgb(${rv},${gv},${bv})`;
-    document.body.style.background = css;
-    document.getElementById('content-sections').style.setProperty('--sb-bg-shift', css);
-  } else {
-    paletteTimer = 0; paletteIndex = 0; paletteTarget = 0; paletteMix = 0;
-    scene.background.setHex(0x1d1d1f);
-    scene.fog.color.setHex(0x1d1d1f);
-    document.body.style.background = '#1d1d1f';
+  // Mouse tilt fallback if quickTo was not initialized
+  if (!quickRotX) {
+    ROOT.rotation.x += ((-mouse.y * .12) - ROOT.rotation.x) * .05;
+    ROOT.rotation.y += ((mouse.x * .12) - ROOT.rotation.y) * .05;
   }
 
   renderer.render(scene, camera);
