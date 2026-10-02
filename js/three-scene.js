@@ -2,8 +2,8 @@
  * Estudio El Oso — Photography
  * js/three-scene.js
  *
- * Master Cine Camera & Multi-Element Optical Lens System (Awwwards-Tier 3D Experience)
- * Powered by Three.js (r158) + GSAP & ScrollTrigger
+ * Master 3D Cine Camera & Multi-Element Optical Lens System
+ * Built with Three.js (r158) + GSAP & ScrollTrigger
  */
 
 import * as THREE from 'three';
@@ -15,13 +15,9 @@ if (gsap && ScrollTrigger) {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-/* ── Math & Easing Utilities ── */
-const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
-const lerp  = (a, b, t) => a + (b - a) * t;
-
 /* ── DOM Container & WebGL Renderer ── */
 const container = document.getElementById('wrap');
-const renderer  = new THREE.WebGLRenderer({
+const renderer = new THREE.WebGLRenderer({
   antialias: true,
   powerPreference: 'high-performance',
   alpha: false
@@ -32,26 +28,27 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.15;
+renderer.toneMappingExposure = 1.2;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 container.appendChild(renderer.domElement);
 
-/* ── Scene & Atmospheric Fog ── */
+/* ── Scene & Atmospheric Depth ── */
 const scene = new THREE.Scene();
 const BG_COLOR = 0x0c0c0f;
 scene.background = new THREE.Color(BG_COLOR);
-scene.fog = new THREE.FogExp2(BG_COLOR, 0.065);
+scene.fog = new THREE.FogExp2(BG_COLOR, 0.055);
 
 /* ── Perspective Camera ── */
-const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.01, 150);
-camera.position.set(0, 0, 4.4);
+// Start positioned to view the full camera at beauty 3/4 angle
+const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.05, 120);
+camera.position.set(0, 0, 6.2);
 
 /* ════════════════════════════════════════════════════════════════
    PROCEDURAL TEXTURE GENERATORS (Zero-latency high-res canvas)
    ════════════════════════════════════════════════════════════════ */
 
 /**
- * High-res front ring typography: "ESTUDIO EL OSO ◈ CINE PRO 24-70mm F/2.8"
+ * High-res front ring typography with correct upright circular orientation
  */
 function createFrontRingTexture() {
   const size = 1024;
@@ -61,7 +58,7 @@ function createFrontRingTexture() {
   const cx = size / 2, cy = size / 2, r = size / 2;
 
   // Base metallic dark disc
-  ctx.fillStyle = '#161619';
+  ctx.fillStyle = '#141417';
   ctx.fillRect(0, 0, size, size);
 
   // Micro radial brush lines for anodized metal texture
@@ -72,31 +69,31 @@ function createFrontRingTexture() {
   for (let i = 0; i < 360; i += 1.5) {
     ctx.rotate(Math.PI / 120);
     ctx.beginPath();
-    ctx.moveTo(r * 0.6, 0);
+    ctx.moveTo(r * 0.62, 0);
     ctx.lineTo(r * 0.98, 0);
     ctx.stroke();
   }
   ctx.restore();
 
-  // Subtle concentric guide rings
-  ctx.strokeStyle = '#28282d';
-  ctx.lineWidth = 1.5;
+  // Concentric decorative grooves
+  ctx.strokeStyle = '#28282e';
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(cx, cy, r * 0.95, 0, Math.PI * 2);
-  ctx.arc(cx, cy, r * 0.72, 0, Math.PI * 2);
+  ctx.arc(cx, cy, r * 0.96, 0, Math.PI * 2);
+  ctx.arc(cx, cy, r * 0.70, 0, Math.PI * 2);
   ctx.stroke();
 
-  // Text 1: Top Arc "ESTUDIO EL OSO ◈ CINE MASTER"
+  // Top Arc: "ESTUDIO EL OSO ◈ CINE PRO MASTER"
   ctx.save();
   ctx.translate(cx, cy);
   ctx.font = '600 24px "Space Grotesk", sans-serif';
-  ctx.fillStyle = '#e4e4e8';
+  ctx.fillStyle = '#f0f0f4';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  const text1 = 'ESTUDIO EL OSO  ◈  CINE MASTER';
+  const text1 = 'ESTUDIO EL OSO  ◈  CINE PRO MASTER';
   const chars1 = text1.split('');
-  const arcLength1 = Math.PI * 0.85;
+  const arcLength1 = Math.PI * 0.82;
   const startAngle1 = -Math.PI / 2 - arcLength1 / 2;
   const step1 = arcLength1 / (chars1.length - 1);
 
@@ -104,42 +101,43 @@ function createFrontRingTexture() {
     const angle = startAngle1 + i * step1;
     ctx.save();
     ctx.rotate(angle + Math.PI / 2);
-    ctx.translate(0, -r * 0.84);
+    ctx.translate(0, -r * 0.83);
     ctx.fillText(ch, 0, 0);
     ctx.restore();
   });
 
-  // Text 2: Bottom Arc "FE 24-70mm F/2.8 NANO AR COATING Ø82mm № 02448"
-  ctx.font = '500 20px "Space Grotesk", sans-serif';
+  // Bottom Arc: "FE 24-70mm F/2.8 · NANO AR COATING · Ø82mm" (Upright, non-reversed!)
+  ctx.font = '500 21px "Space Grotesk", sans-serif';
   ctx.fillStyle = '#d4a359'; // Warm golden lettering
 
-  const text2 = 'FE 24-70mm  F/2.8  NANO AR COATING  Ø82mm  № 02448';
+  const text2 = 'FE 24-70mm F/2.8  ◈  NANO AR COATING  ◈  Ø82mm';
   const chars2 = text2.split('');
-  const arcLength2 = Math.PI * 0.92;
-  const startAngle2 = Math.PI / 2 - arcLength2 / 2;
+  const arcLength2 = Math.PI * 0.85;
+  const startAngle2 = Math.PI / 2 + arcLength2 / 2;
   const step2 = arcLength2 / (chars2.length - 1);
 
   chars2.forEach((ch, i) => {
-    const angle = startAngle2 + i * step2;
+    const angle = startAngle2 - i * step2;
     ctx.save();
     ctx.rotate(angle - Math.PI / 2);
-    ctx.translate(0, r * 0.84);
+    ctx.translate(0, -r * 0.83);
+    ctx.rotate(Math.PI); // Rotate 180deg so characters remain upright along bottom arc
     ctx.fillText(ch, 0, 0);
     ctx.restore();
   });
   ctx.restore();
 
-  // Fine tick marks around perimeter
+  // Gold indicator notches
   ctx.save();
   ctx.translate(cx, cy);
-  ctx.strokeStyle = 'rgba(212, 163, 89, 0.4)';
-  ctx.lineWidth = 1.5;
-  for (let a = 0; a < Math.PI * 2; a += Math.PI / 36) {
+  ctx.strokeStyle = '#d4a359';
+  ctx.lineWidth = 2;
+  for (let a = 0; a < Math.PI * 2; a += Math.PI / 18) {
     ctx.save();
     ctx.rotate(a);
     ctx.beginPath();
-    ctx.moveTo(0, r * 0.92);
-    ctx.lineTo(0, r * 0.95);
+    ctx.moveTo(0, r * 0.93);
+    ctx.lineTo(0, r * 0.96);
     ctx.stroke();
     ctx.restore();
   }
@@ -157,7 +155,7 @@ function createFrontRingTexture() {
 }
 
 /**
- * Ribbed grip texture for focus and zoom knurling (bump map)
+ * Ribbed grip texture for zoom ring knurling
  */
 function createRibbedNormalTexture(density = 64) {
   const canvas = document.createElement('canvas');
@@ -175,7 +173,7 @@ function createRibbedNormalTexture(density = 64) {
   const tex = new THREE.CanvasTexture(canvas);
   tex.wrapS = THREE.RepeatWrapping;
   tex.wrapT = THREE.RepeatWrapping;
-  tex.repeat.set(12, 1);
+  tex.repeat.set(16, 1);
   return tex;
 }
 
@@ -277,7 +275,6 @@ function createDistanceScaleTexture() {
   ctx.fillRect(0, 0, 512, 64);
 
   // Markers
-  ctx.fillStyle = '#f0f0f2';
   ctx.font = '500 16px "Space Grotesk", sans-serif';
   ctx.textAlign = 'center';
 
@@ -307,7 +304,7 @@ function createDistanceScaleTexture() {
 }
 
 /* ════════════════════════════════════════════════════════════════
-   LUXURY MATERIALS (Photorealistic PBR with Optical Iridescence)
+   LUXURY MATERIALS (PBR with Physical Optical Iridescence)
    ════════════════════════════════════════════════════════════════ */
 
 const ribbedNormalTex = createRibbedNormalTexture();
@@ -316,18 +313,18 @@ const leatheretteBump = createLeatheretteTexture();
 
 // 1. Camera Body Magnesium Alloy
 const matBodyChassis = new THREE.MeshStandardMaterial({
-  color: 0x161619,
+  color: 0x18181b,
   metalness: 0.88,
-  roughness: 0.32,
+  roughness: 0.35,
   bumpMap: leatheretteBump,
   bumpScale: 0.008
 });
 
 // 2. Anodized Dark Metal (Stepped Lens Barrels)
 const matLensMetal = new THREE.MeshStandardMaterial({
-  color: 0x19191d,
+  color: 0x1b1b20,
   metalness: 0.92,
-  roughness: 0.24
+  roughness: 0.22
 });
 
 // 3. Matte Tactile Grip Rubber (Zoom Ring)
@@ -341,9 +338,9 @@ const matRibbedRubber = new THREE.MeshStandardMaterial({
 
 // 4. Diamond Knurled Metal (Focus Ring)
 const matFocusKnurl = new THREE.MeshStandardMaterial({
-  color: 0x1c1c20,
+  color: 0x1f1f24,
   metalness: 0.85,
-  roughness: 0.38,
+  roughness: 0.36,
   bumpMap: diamondKnurlTex,
   bumpScale: 0.04
 });
@@ -357,7 +354,7 @@ const matTitaniumChrome = new THREE.MeshStandardMaterial({
 
 // 6. Iconic Luxury Cinema Red Accent Ring
 const matCinemaRed = new THREE.MeshStandardMaterial({
-  color: 0xba1a1a,
+  color: 0xc41e1e,
   metalness: 0.82,
   roughness: 0.22
 });
@@ -371,12 +368,12 @@ const matGoldAccent = new THREE.MeshStandardMaterial({
 
 // 8. Front Optical Glass: High-transmission Physical Material with Thin-Film Iridescence
 const matFrontGlass = new THREE.MeshPhysicalMaterial({
-  transmission: 0.92,
-  thickness: 0.45,
-  roughness: 0.015,
+  transmission: 0.94,
+  thickness: 0.40,
+  roughness: 0.012,
   metalness: 0.02,
   ior: 1.54,
-  reflectivity: 0.88,
+  reflectivity: 0.90,
   clearcoat: 1.0,
   clearcoatRoughness: 0.02,
   iridescence: 0.88, // Genuine multi-coating optical interference (emerald/magenta)
@@ -389,9 +386,9 @@ const matFrontGlass = new THREE.MeshPhysicalMaterial({
 
 // 9. Internal Optics Glass (Floating Doublet)
 const matInternalGlass = new THREE.MeshPhysicalMaterial({
-  transmission: 0.88,
-  thickness: 0.32,
-  roughness: 0.03,
+  transmission: 0.90,
+  thickness: 0.28,
+  roughness: 0.02,
   metalness: 0.05,
   ior: 1.62,
   reflectivity: 0.92,
@@ -399,7 +396,7 @@ const matInternalGlass = new THREE.MeshPhysicalMaterial({
   iridescenceIOR: 1.4,
   iridescenceThicknessRange: [220, 520],
   transparent: true,
-  opacity: 0.9,
+  opacity: 0.90,
   side: THREE.DoubleSide
 });
 
@@ -419,108 +416,108 @@ MASTER_RIG.add(LENS_ASSEMBLY);
 /* ── 1. CAMERA BODY SCULPTING (High-End Mirrorless Chassis) ── */
 {
   // Main chassis box with subtle bevel
-  const chassisGeo = new THREE.BoxGeometry(2.35, 1.45, 0.68);
+  const chassisGeo = new THREE.BoxGeometry(2.6, 1.55, 0.72);
   const chassisMesh = new THREE.Mesh(chassisGeo, matBodyChassis);
-  chassisMesh.position.set(0.24, -0.06, -0.65);
+  chassisMesh.position.set(0.24, -0.05, -0.55);
   chassisMesh.castShadow = true;
   CAMERA_BODY.add(chassisMesh);
 
   // Right-hand sculpted grip
-  const gripGeo = new THREE.BoxGeometry(0.55, 1.42, 0.48);
+  const gripGeo = new THREE.BoxGeometry(0.58, 1.52, 0.52);
   const gripMesh = new THREE.Mesh(gripGeo, matBodyChassis);
-  gripMesh.position.set(1.18, -0.07, -0.42);
+  gripMesh.position.set(1.28, -0.06, -0.32);
   gripMesh.rotation.y = -0.08;
   gripMesh.castShadow = true;
   CAMERA_BODY.add(gripMesh);
 
   // Top Viewfinder / Prism Hump
-  const prismGeo = new THREE.CylinderGeometry(0.42, 0.52, 0.48, 4);
+  const prismGeo = new THREE.CylinderGeometry(0.44, 0.55, 0.48, 4);
   prismGeo.rotateY(Math.PI / 4);
   const prismMesh = new THREE.Mesh(prismGeo, matLensMetal);
-  prismMesh.position.set(0, 0.82, -0.65);
+  prismMesh.position.set(0, 0.88, -0.55);
   prismMesh.castShadow = true;
   CAMERA_BODY.add(prismMesh);
 
   // Hotshoe mount with contact points
-  const hotshoeGeo = new THREE.BoxGeometry(0.28, 0.06, 0.32);
+  const hotshoeGeo = new THREE.BoxGeometry(0.30, 0.06, 0.34);
   const hotshoeMesh = new THREE.Mesh(hotshoeGeo, matTitaniumChrome);
-  hotshoeMesh.position.set(0, 1.08, -0.65);
+  hotshoeMesh.position.set(0, 1.14, -0.55);
   CAMERA_BODY.add(hotshoeMesh);
 
   // Top Dial 1: Shutter Speed / ISO Dial
-  const dial1Geo = new THREE.CylinderGeometry(0.24, 0.24, 0.16, 32);
+  const dial1Geo = new THREE.CylinderGeometry(0.25, 0.25, 0.16, 32);
   const dial1 = new THREE.Mesh(dial1Geo, matTitaniumChrome);
-  dial1.position.set(0.68, 0.72, -0.65);
+  dial1.position.set(0.74, 0.78, -0.55);
   dial1.castShadow = true;
   CAMERA_BODY.add(dial1);
 
   // Top Dial 2: Mode Dial (M / A / S / P)
-  const dial2Geo = new THREE.CylinderGeometry(0.22, 0.22, 0.14, 32);
+  const dial2Geo = new THREE.CylinderGeometry(0.23, 0.23, 0.14, 32);
   const dial2 = new THREE.Mesh(dial2Geo, matLensMetal);
-  dial2.position.set(-0.72, 0.70, -0.65);
+  dial2.position.set(-0.76, 0.76, -0.55);
   dial2.castShadow = true;
   CAMERA_BODY.add(dial2);
 
   // Shutter Button with Chrome Collar
   const collarGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.12, 24);
   const collar = new THREE.Mesh(collarGeo, matLensMetal);
-  collar.position.set(1.15, 0.72, -0.46);
+  collar.position.set(1.22, 0.78, -0.36);
   const shutterBtnGeo = new THREE.CylinderGeometry(0.09, 0.09, 0.16, 24);
   const shutterBtn = new THREE.Mesh(shutterBtnGeo, matTitaniumChrome);
-  shutterBtn.position.set(1.15, 0.76, -0.46);
+  shutterBtn.position.set(1.22, 0.82, -0.36);
   CAMERA_BODY.add(collar);
   CAMERA_BODY.add(shutterBtn);
 
   // Stainless Steel Bayonet Mount Flange
   const mountRingGeo = new THREE.TorusGeometry(1.08, 0.038, 16, 64);
   const mountRing = new THREE.Mesh(mountRingGeo, matTitaniumChrome);
-  mountRing.position.set(0, 0, -0.31);
+  mountRing.position.set(0, 0, -0.18);
   CAMERA_BODY.add(mountRing);
 
   // Luxury Brand Badge Plate: "ESTUDIO EL OSO"
-  const badgePlateGeo = new THREE.BoxGeometry(0.64, 0.12, 0.02);
+  const badgePlateGeo = new THREE.BoxGeometry(0.68, 0.13, 0.02);
   const badgePlate = new THREE.Mesh(badgePlateGeo, matLensMetal);
-  badgePlate.position.set(-0.72, 0.44, -0.3);
+  badgePlate.position.set(-0.76, 0.46, -0.18);
   CAMERA_BODY.add(badgePlate);
 
-  const badgeInlayGeo = new THREE.BoxGeometry(0.58, 0.04, 0.025);
+  const badgeInlayGeo = new THREE.BoxGeometry(0.60, 0.04, 0.025);
   const badgeInlay = new THREE.Mesh(badgeInlayGeo, matGoldAccent);
-  badgeInlay.position.set(-0.72, 0.44, -0.29);
+  badgeInlay.position.set(-0.76, 0.46, -0.17);
   CAMERA_BODY.add(badgeInlay);
 }
 
-/* ── 2. MASTER CINE LENS BARREL (Stepped Metal & Tactile Rings) ── */
+/* ── 2. MASTER CINE LENS BARREL ── */
 let zoomRingMesh, focusRingMesh, distanceScaleGroup;
 
 {
   // Stage 1: Base Mount Barrel
-  const baseBarrelGeo = new THREE.CylinderGeometry(1.04, 1.04, 0.38, 64);
+  const baseBarrelGeo = new THREE.CylinderGeometry(1.02, 1.02, 0.32, 64);
   baseBarrelGeo.rotateX(Math.PI / 2);
   const baseBarrel = new THREE.Mesh(baseBarrelGeo, matLensMetal);
-  baseBarrel.position.z = -0.12;
+  baseBarrel.position.z = 0.02;
   baseBarrel.castShadow = true;
   LENS_ASSEMBLY.add(baseBarrel);
 
   // Stage 2: Ribbed Zoom Ring
-  const zoomRingGeo = new THREE.CylinderGeometry(1.055, 1.055, 0.52, 64);
+  const zoomRingGeo = new THREE.CylinderGeometry(1.045, 1.045, 0.48, 64);
   zoomRingGeo.rotateX(Math.PI / 2);
   zoomRingMesh = new THREE.Mesh(zoomRingGeo, matRibbedRubber);
-  zoomRingMesh.position.z = 0.28;
+  zoomRingMesh.position.z = 0.40;
   zoomRingMesh.castShadow = true;
   LENS_ASSEMBLY.add(zoomRingMesh);
 
   // Stage 3: Distance Scale Housing & Window
-  const scaleHousingGeo = new THREE.CylinderGeometry(1.03, 1.03, 0.36, 64);
+  const scaleHousingGeo = new THREE.CylinderGeometry(1.025, 1.025, 0.34, 64);
   scaleHousingGeo.rotateX(Math.PI / 2);
   const scaleHousing = new THREE.Mesh(scaleHousingGeo, matLensMetal);
-  scaleHousing.position.z = 0.68;
+  scaleHousing.position.z = 0.80;
   LENS_ASSEMBLY.add(scaleHousing);
 
   // Internal Revolving Distance Barrel
   distanceScaleGroup = new THREE.Group();
-  distanceScaleGroup.position.z = 0.68;
+  distanceScaleGroup.position.z = 0.80;
   const scaleTex = createDistanceScaleTexture();
-  const scaleInnerGeo = new THREE.CylinderGeometry(1.01, 1.01, 0.24, 48, 1, true, -Math.PI / 4, Math.PI / 2);
+  const scaleInnerGeo = new THREE.CylinderGeometry(1.005, 1.005, 0.22, 48, 1, true, -Math.PI / 4, Math.PI / 2);
   scaleInnerGeo.rotateX(Math.PI / 2);
   const scaleInnerMat = new THREE.MeshBasicMaterial({ map: scaleTex });
   const scaleInnerMesh = new THREE.Mesh(scaleInnerGeo, scaleInnerMat);
@@ -528,68 +525,68 @@ let zoomRingMesh, focusRingMesh, distanceScaleGroup;
   LENS_ASSEMBLY.add(distanceScaleGroup);
 
   // Transparent Acrylic Scale Window Glass
-  const scaleWinGeo = new THREE.CylinderGeometry(1.035, 1.035, 0.22, 32, 1, true, -Math.PI / 5, Math.PI / 2.5);
+  const scaleWinGeo = new THREE.CylinderGeometry(1.03, 1.03, 0.20, 32, 1, true, -Math.PI / 5, Math.PI / 2.5);
   scaleWinGeo.rotateX(Math.PI / 2);
   const scaleWinMat = new THREE.MeshPhysicalMaterial({
-    transmission: 0.92,
-    roughness: 0.05,
+    transmission: 0.94,
+    roughness: 0.04,
     ior: 1.5,
     transparent: true,
-    opacity: 0.85
+    opacity: 0.88
   });
   const scaleWin = new THREE.Mesh(scaleWinGeo, scaleWinMat);
-  scaleWin.position.z = 0.68;
+  scaleWin.position.z = 0.80;
   LENS_ASSEMBLY.add(scaleWin);
 
   // Stage 4: Broad Diamond-Knurled Focus Ring
-  const focusRingGeo = new THREE.CylinderGeometry(1.045, 1.045, 0.58, 64);
+  const focusRingGeo = new THREE.CylinderGeometry(1.04, 1.04, 0.54, 64);
   focusRingGeo.rotateX(Math.PI / 2);
   focusRingMesh = new THREE.Mesh(focusRingGeo, matFocusKnurl);
-  focusRingMesh.position.z = 1.12;
+  focusRingMesh.position.z = 1.22;
   focusRingMesh.castShadow = true;
   LENS_ASSEMBLY.add(focusRingMesh);
 
   // Stage 5: Cinema Red Accent Ring
-  const redRingGeo = new THREE.TorusGeometry(1.035, 0.016, 16, 64);
+  const redRingGeo = new THREE.TorusGeometry(1.025, 0.016, 16, 64);
   const redRing = new THREE.Mesh(redRingGeo, matCinemaRed);
-  redRing.position.z = 1.44;
+  redRing.position.z = 1.52;
   LENS_ASSEMBLY.add(redRing);
 
   // Titanium Bevel Spacer
-  const bevelRingGeo = new THREE.TorusGeometry(1.03, 0.022, 16, 64);
+  const bevelRingGeo = new THREE.TorusGeometry(1.02, 0.020, 16, 64);
   const bevelRing = new THREE.Mesh(bevelRingGeo, matTitaniumChrome);
-  bevelRing.position.z = 1.48;
+  bevelRing.position.z = 1.56;
   LENS_ASSEMBLY.add(bevelRing);
 
   // Stage 6: Front Barrel & Filter Threads
-  const frontBarrelGeo = new THREE.CylinderGeometry(1.025, 1.025, 0.28, 64);
+  const frontBarrelGeo = new THREE.CylinderGeometry(1.015, 1.015, 0.24, 64);
   frontBarrelGeo.rotateX(Math.PI / 2);
   const frontBarrel = new THREE.Mesh(frontBarrelGeo, matLensMetal);
-  frontBarrel.position.z = 1.62;
+  frontBarrel.position.z = 1.68;
   LENS_ASSEMBLY.add(frontBarrel);
 
   // Front Filter Thread Lip
-  const filterLipGeo = new THREE.TorusGeometry(0.98, 0.038, 16, 64);
+  const filterLipGeo = new THREE.TorusGeometry(0.97, 0.034, 16, 64);
   const filterLip = new THREE.Mesh(filterLipGeo, matLensMetal);
-  filterLip.position.z = 1.76;
+  filterLip.position.z = 1.80;
   LENS_ASSEMBLY.add(filterLip);
 
   // Stage 7: Front Printed Ring with Studio Branding & Specs
   const frontRingTex = createFrontRingTexture();
-  const frontRingGeo = new THREE.RingGeometry(0.68, 0.97, 64);
+  const frontRingGeo = new THREE.RingGeometry(0.68, 0.96, 64);
   const frontRingMat = new THREE.MeshStandardMaterial({
     map: frontRingTex,
     metalness: 0.85,
     roughness: 0.28
   });
   const frontRing = new THREE.Mesh(frontRingGeo, frontRingMat);
-  frontRing.position.z = 1.77;
+  frontRing.position.z = 1.81;
   LENS_ASSEMBLY.add(frontRing);
 
   // Inner Gold Retaining Ring
   const innerGoldGeo = new THREE.TorusGeometry(0.675, 0.012, 16, 64);
   const innerGold = new THREE.Mesh(innerGoldGeo, matGoldAccent);
-  innerGold.position.z = 1.775;
+  innerGold.position.z = 1.815;
   LENS_ASSEMBLY.add(innerGold);
 }
 
@@ -600,41 +597,41 @@ let frontOpticMesh, internalDoubletMesh;
   // Element 1: Front Aspherical Doublet (Curved Meniscus)
   const frontOpticGeo = new THREE.SphereGeometry(0.67, 48, 24, 0, Math.PI * 2, 0, Math.PI * 0.36);
   frontOpticMesh = new THREE.Mesh(frontOpticGeo, matFrontGlass);
-  frontOpticMesh.position.z = 1.62;
+  frontOpticMesh.position.z = 1.66;
   frontOpticMesh.rotation.x = Math.PI / 2;
   LENS_ASSEMBLY.add(frontOpticMesh);
 
   // Element 2: Internal Floating Focus Optic
   const doubletGeo = new THREE.SphereGeometry(0.56, 36, 18, 0, Math.PI * 2, 0, Math.PI * 0.28);
   internalDoubletMesh = new THREE.Mesh(doubletGeo, matInternalGlass);
-  internalDoubletMesh.position.z = 0.92;
+  internalDoubletMesh.position.z = 1.02;
   internalDoubletMesh.rotation.x = -Math.PI / 2;
   LENS_ASSEMBLY.add(internalDoubletMesh);
 
   // Deep Rear Element
   const rearOpticGeo = new THREE.CircleGeometry(0.48, 36);
   const rearOptic = new THREE.Mesh(rearOpticGeo, matFrontGlass);
-  rearOptic.position.z = -0.15;
+  rearOptic.position.z = -0.05;
   LENS_ASSEMBLY.add(rearOptic);
 }
 
 /* ── 4. 12-BLADE KINETIC MECHANICAL APERTURE DIAPHRAGM ── */
 const DIAPHRAGM_GROUP = new THREE.Group();
-DIAPHRAGM_GROUP.position.z = 0.44;
+DIAPHRAGM_GROUP.position.z = 0.58;
 LENS_ASSEMBLY.add(DIAPHRAGM_GROUP);
 
 const BLADE_COUNT = 12;
 const matIrisBlade = new THREE.MeshStandardMaterial({
   color: 0x121215,
   metalness: 0.92,
-  roughness: 0.14,
+  roughness: 0.16,
   side: THREE.DoubleSide
 });
 
 for (let i = 0; i < BLADE_COUNT; i++) {
   const angle = (i / BLADE_COUNT) * Math.PI * 2;
   const shape = new THREE.Shape();
-  const r0 = 0.05, r1 = 0.54, sw = 0.18;
+  const r0 = 0.08, r1 = 0.54, sw = 0.18;
   shape.moveTo(0, r0);
   shape.quadraticCurveTo(sw * 0.85, r1 * 0.48, sw * 0.42, r1);
   shape.quadraticCurveTo(0, r1 * 1.01, -sw * 0.42, r1);
@@ -645,28 +642,25 @@ for (let i = 0; i < BLADE_COUNT; i++) {
   DIAPHRAGM_GROUP.add(bladeMesh);
 }
 
-// Circular Aperture Backing Depth
-const irisBackGeo = new THREE.CircleGeometry(0.55, 36);
-const irisBackMat = new THREE.MeshBasicMaterial({ color: 0x050507 });
-const irisBack = new THREE.Mesh(irisBackGeo, irisBackMat);
-irisBack.position.z = -0.02;
-DIAPHRAGM_GROUP.add(irisBack);
+// Circular Aperture Chamber Ring (kept open in center!)
+const irisRimGeo = new THREE.RingGeometry(0.20, 0.62, 36);
+const irisRimMat = new THREE.MeshBasicMaterial({ color: 0x08080b, side: THREE.DoubleSide });
+const irisRim = new THREE.Mesh(irisRimGeo, irisRimMat);
+irisRim.position.z = -0.02;
+DIAPHRAGM_GROUP.add(irisRim);
 
 /* ── 5. CINEMATIC OPTICAL BOKEH / ATMOSPHERIC PARTICLES ── */
-const BOKEH_COUNT = 60;
+const BOKEH_COUNT = 50;
 const bokehGeo = new THREE.BufferGeometry();
 const bokehPositions = new Float32Array(BOKEH_COUNT * 3);
-const bokehScales    = new Float32Array(BOKEH_COUNT);
-const bokehSpeeds    = [];
+const bokehSpeeds = [];
 
 for (let i = 0; i < BOKEH_COUNT; i++) {
-  bokehPositions[i * 3 + 0] = (Math.random() - 0.5) * 8.0;
-  bokehPositions[i * 3 + 1] = (Math.random() - 0.5) * 6.0;
-  bokehPositions[i * 3 + 2] = Math.random() * 5.0 - 1.5;
-  bokehScales[i] = Math.random() * 0.22 + 0.06;
+  bokehPositions[i * 3 + 0] = (Math.random() - 0.5) * 10.0;
+  bokehPositions[i * 3 + 1] = (Math.random() - 0.5) * 7.0;
+  bokehPositions[i * 3 + 2] = Math.random() * 6.0 - 1.0;
   bokehSpeeds.push({
-    x: (Math.random() - 0.5) * 0.0015,
-    y: Math.random() * 0.002 + 0.0008,
+    y: Math.random() * 0.0018 + 0.0006,
     phase: Math.random() * Math.PI * 2
   });
 }
@@ -674,7 +668,7 @@ for (let i = 0; i < BOKEH_COUNT; i++) {
 bokehGeo.setAttribute('position', new THREE.BufferAttribute(bokehPositions, 3));
 const bokehTex = createBokehTexture();
 const bokehMat = new THREE.PointsMaterial({
-  size: 0.35,
+  size: 0.42,
   map: bokehTex,
   transparent: true,
   opacity: 0.65,
@@ -685,61 +679,57 @@ const bokehField = new THREE.Points(bokehGeo, bokehMat);
 scene.add(bokehField);
 
 /* ════════════════════════════════════════════════════════════════
-   STUDIO LIGHTING RIG (Cinematic grazing rim highlights)
+   STUDIO LIGHTING RIG
    ════════════════════════════════════════════════════════════════ */
 
-// Ambient soft fill
-const ambLight = new THREE.AmbientLight(0x181824, 0.45);
+const ambLight = new THREE.AmbientLight(0x222230, 0.55);
 scene.add(ambLight);
 
 // Key Softbox (Top Right)
-const keyLight = new THREE.DirectionalLight(0xffffff, 3.2);
-keyLight.position.set(4, 6, 4.5);
+const keyLight = new THREE.DirectionalLight(0xffffff, 3.4);
+keyLight.position.set(5, 6, 5);
 keyLight.castShadow = true;
-keyLight.shadow.mapSize.set(1024, 1024);
 scene.add(keyLight);
 
-// Anamorphic Cyan/Blue Grazing Rim (Edges of metal & glass)
-const blueRimLight = new THREE.PointLight(0x2a75ff, 3.8, 14);
-blueRimLight.position.set(-4.5, 2.5, 2.8);
+// Anamorphic Cyan Rim Light (Highlighting chamfer edges)
+const blueRimLight = new THREE.PointLight(0x2870ff, 4.2, 16);
+blueRimLight.position.set(-5, 3, 3);
 scene.add(blueRimLight);
 
-// Warm Amber Interior Light (Illuminating gold and internal optics)
-const goldRimLight = new THREE.PointLight(0xe8aa4a, 2.8, 12);
-goldRimLight.position.set(3.5, -2.8, 2.2);
+// Warm Amber Interior Light
+const goldRimLight = new THREE.PointLight(0xe8aa4a, 3.2, 14);
+goldRimLight.position.set(4, -3, 2.5);
 scene.add(goldRimLight);
 
 // Top Specular Catchlight
-const spotCatch = new THREE.SpotLight(0xffffff, 2.6, 20, 0.32, 0.85);
-spotCatch.position.set(0, 9, 3);
+const spotCatch = new THREE.SpotLight(0xffffff, 2.8, 22, 0.35, 0.85);
+spotCatch.position.set(0, 10, 3.5);
 scene.add(spotCatch);
 
-// Dynamic Mouse Optical Glint Light (Glides across front glass curve)
-const glintLight = new THREE.PointLight(0x99ddff, 1.8, 6);
-glintLight.position.set(0, 0, 2.2);
+// Dynamic Mouse Glint Light (Glides across front glass curve)
+const glintLight = new THREE.PointLight(0xaaddff, 2.0, 7);
+glintLight.position.set(0, 0, 2.5);
 scene.add(glintLight);
 
 /* ════════════════════════════════════════════════════════════════
-   GSAP TIMELINE & SCROLL-TRIGGER CHOREOGRAPHY
+   ANIMATION STATE & GSAP SCROLL-TRIGGER CHOREOGRAPHY
    ════════════════════════════════════════════════════════════════ */
 
+// Initial state: Start far enough back with beauty 3/4 angle
 const anim = {
   p: 0,
-  camZ: 4.4,
-  camY: 0,
-  // Start with elegant 3/4 beauty hero angle
-  rigRotY: 0.28,
-  rigRotX: 0.12,
-  rigRotZ: 0,
-  rigY: -0.05,
+  camZ: 6.2,
+  // 3/4 beauty view: clearly displays chassis, grip, dials, barrel, and glass
+  rigRotY: -0.42,
+  rigRotX: 0.14,
   focusRot: 0,
   zoomRot: 0,
   diaphragmScale: 1.0,
   diaphragmRot: 0,
-  glintIntensity: 1.8,
-  keyIntensity: 3.2,
-  blueIntensity: 3.8,
-  goldIntensity: 2.8
+  sceneOpacity: 1.0,
+  keyIntensity: 3.4,
+  blueIntensity: 4.2,
+  goldIntensity: 3.2
 };
 
 // UI Element References
@@ -756,33 +746,12 @@ const elST       = document.getElementById('st');
 const elSS       = document.getElementById('ss');
 const scrollTrack = document.getElementById('scroll-track');
 
-/* ── Silky Mouse Parallax with GSAP quickTo ── */
-let mouse = { x: 0, y: 0 };
-let quickTiltX = null;
-let quickTiltY = null;
-let quickGlintX = null;
-let quickGlintY = null;
-
-if (gsap) {
-  quickTiltX  = gsap.quickTo(MASTER_RIG.rotation, 'x', { duration: 0.9, ease: 'power2.out' });
-  quickTiltY  = gsap.quickTo(MASTER_RIG.rotation, 'y', { duration: 0.9, ease: 'power2.out' });
-  quickGlintX = gsap.quickTo(glintLight.position, 'x', { duration: 0.6, ease: 'power2.out' });
-  quickGlintY = gsap.quickTo(glintLight.position, 'y', { duration: 0.6, ease: 'power2.out' });
-}
+/* ── Mouse Coordinates ── */
+let mouse = { x: 0, y: 0, targetX: 0, targetY: 0 };
 
 window.addEventListener('mousemove', e => {
   mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
   mouse.y = -(e.clientY / window.innerHeight - 0.5) * 2;
-
-  if (quickTiltX && quickTiltY) {
-    // Combine base animation rotation with responsive mouse tilt
-    quickTiltX(anim.rigRotX - mouse.y * 0.14);
-    quickTiltY(anim.rigRotY + mouse.x * 0.16);
-  }
-  if (quickGlintX && quickGlintY) {
-    quickGlintX(mouse.x * 1.8);
-    quickGlintY(mouse.y * 1.4);
-  }
 }, { passive: true });
 
 window.addEventListener('touchmove', e => {
@@ -790,11 +759,6 @@ window.addEventListener('touchmove', e => {
   const t = e.touches[0];
   mouse.x = (t.clientX / window.innerWidth - 0.5) * 2;
   mouse.y = -(t.clientY / window.innerHeight - 0.5) * 2;
-
-  if (quickTiltX && quickTiltY) {
-    quickTiltX(anim.rigRotX - mouse.y * 0.1);
-    quickTiltY(anim.rigRotY + mouse.x * 0.12);
-  }
 }, { passive: true });
 
 window.addEventListener('resize', () => {
@@ -804,9 +768,9 @@ window.addEventListener('resize', () => {
   if (ScrollTrigger) ScrollTrigger.refresh();
 });
 
-/* ── Entrance Stagger on Initial Page Load ── */
+/* ── Page Load Entrance Animation ── */
 if (gsap) {
-  const introTl = gsap.timeline({ delay: 0.18 });
+  const introTl = gsap.timeline({ delay: 0.15 });
   const eyebrow = elHero ? elHero.querySelector('.eyebrow') : null;
 
   if (eyebrow) {
@@ -824,14 +788,14 @@ if (gsap) {
   }
 }
 
-/* ── Cinematic Scroll-Driven Zoom with Inertia ── */
+/* ── GSAP ScrollTrigger Master Timeline (Flawless Scrub with Inertia) ── */
 if (gsap && ScrollTrigger && scrollTrack) {
   const scrollTl = gsap.timeline({
     scrollTrigger: {
       trigger: scrollTrack,
       start: 'top top',
       end: 'bottom bottom',
-      scrub: 1.2, // Silk-smooth momentum catch-up
+      scrub: 1.2,
       onUpdate: (self) => {
         anim.p = self.progress;
 
@@ -854,14 +818,14 @@ if (gsap && ScrollTrigger && scrollTrack) {
     }
   });
 
-  // Step 1: Hero text smoothly lifts, scales, and dissolves (0% to 26%)
+  // Step 1: Hero text smoothly lifts, scales, and dissolves (0% to 24%)
   if (elHero) {
     scrollTl.to(elHero, {
       opacity: 0,
-      y: -52,
+      y: -50,
       scale: 0.92,
       ease: 'power2.inOut',
-      duration: 0.26
+      duration: 0.24
     }, 0);
   }
 
@@ -869,21 +833,22 @@ if (gsap && ScrollTrigger && scrollTrack) {
   if (elARR) scrollTl.to(elARR, { opacity: 0, y: 12, ease: 'power1.out', duration: 0.14 }, 0);
   if (elTG) scrollTl.to(elTG, { opacity: 0, y: 10, ease: 'power1.out', duration: 0.14 }, 0);
 
-  // Step 2: Camera pivots from 3/4 beauty view to straight center alignment (0% to 40%)
+  // Step 2: Camera pivots from beauty 3/4 view to align front-and-center (0% to 45%)
   scrollTl.to(anim, {
     rigRotY: 0,
     rigRotX: 0,
     ease: 'power2.out',
-    duration: 0.40
+    duration: 0.45
   }, 0);
 
-  // Step 3: Macro Push into the Lens Barrel & Mechanical Reactions (0% to 100%)
+  // Step 3: Macro Push into the Lens Barrel & Kinematics (0% to 100%)
+  // Safely zooms close to front element (from z:6.2 to z:2.05) without clipping inside!
   scrollTl.to(anim, {
-    camZ: 0.42, // Zooms straight to front optical glass
-    focusRot: Math.PI * 1.2, // Focus ring visibly spins
-    zoomRot: Math.PI * 0.45,
-    diaphragmScale: 0.72, // Aperture blades constrict down to f/5.6
-    diaphragmRot: Math.PI * 0.25,
+    camZ: 2.05,
+    focusRot: Math.PI * 1.5, // Focus ring visibly spins
+    zoomRot: Math.PI * 0.5,
+    diaphragmScale: 0.76, // Diaphragm constricts realistically down to f/5.6
+    diaphragmRot: Math.PI * 0.3,
     keyIntensity: 4.8,
     blueIntensity: 5.5,
     goldIntensity: 4.2,
@@ -891,7 +856,14 @@ if (gsap && ScrollTrigger && scrollTrack) {
     duration: 1.0
   }, 0);
 
-  // Step 4: Top Glassmorphism Navigation & Brand Logo glide in as macro approaches (78% to 96%)
+  // Step 4: Subtle fade of 3D scene at very end of scroll as content appears (85% to 100%)
+  scrollTl.to(container, {
+    opacity: 0.25,
+    ease: 'power1.inOut',
+    duration: 0.15
+  }, 0.85);
+
+  // Step 5: Header Brand and Navigation glide in seamlessly (76% to 94%)
   if (elBrand) {
     scrollTl.fromTo(elBrand,
       { opacity: 0, y: -16, visibility: 'hidden' },
@@ -904,7 +876,7 @@ if (gsap && ScrollTrigger && scrollTrack) {
         onStart: () => { elBrand.style.visibility = 'visible'; },
         onReverseComplete: () => { elBrand.style.visibility = 'hidden'; }
       },
-      0.78
+      0.76
     );
   }
 
@@ -926,7 +898,7 @@ if (gsap && ScrollTrigger && scrollTrack) {
           document.body.classList.remove('show-header-blur');
         }
       },
-      0.80
+      0.78
     );
   }
 }
@@ -941,19 +913,25 @@ function renderFrame() {
   requestAnimationFrame(renderFrame);
   const time = clock.getElapsedTime();
 
-  // 1. Camera position driven by GSAP with subtle organic breathing
+  // 1. Smooth mouse coordinate interpolation
+  mouse.targetX += (mouse.x - mouse.targetX) * 0.055;
+  mouse.targetY += (mouse.y - mouse.targetY) * 0.055;
+
+  // 2. Camera position driven by GSAP with subtle organic breathing
   camera.position.z = anim.camZ;
-  camera.position.y = Math.sin(time * 0.4) * 0.025 * (1 - anim.p * 0.85);
+  camera.position.y = Math.sin(time * 0.35) * 0.03 * (1 - anim.p * 0.8);
 
-  // 2. Base Rig Rotation (interpolated by mouse tilt)
-  if (!quickTiltX) {
-    MASTER_RIG.rotation.x = anim.rigRotX - mouse.y * 0.12;
-    MASTER_RIG.rotation.y = anim.rigRotY + mouse.x * 0.14;
-  }
+  // 3. Master Rig Rotation = GSAP Scroll Animation Base + Interactive Mouse Tilt
+  MASTER_RIG.rotation.x = anim.rigRotX - mouse.targetY * 0.12;
+  MASTER_RIG.rotation.y = anim.rigRotY + mouse.targetX * 0.16;
 
-  // 3. Mechanical Kinematics
+  // 4. Optical Glint Light tracking mouse across front glass curve
+  glintLight.position.x = mouse.targetX * 1.8;
+  glintLight.position.y = mouse.targetY * 1.4;
+
+  // 5. Mechanical Kinematics
   if (focusRingMesh) {
-    focusRingMesh.rotation.z = anim.focusRot + time * 0.05;
+    focusRingMesh.rotation.z = anim.focusRot + time * 0.04;
   }
   if (zoomRingMesh) {
     zoomRingMesh.rotation.z = anim.zoomRot;
@@ -962,28 +940,28 @@ function renderFrame() {
     distanceScaleGroup.rotation.z = anim.focusRot * 0.6;
   }
 
-  // 4. Optical Parallax & Aperture Diaphragm
+  // 6. Compound Optical Parallax & Aperture Diaphragm
   if (internalDoubletMesh) {
-    internalDoubletMesh.position.z = 0.92 - anim.p * 0.15; // Floating element zoom shift!
+    internalDoubletMesh.position.z = 1.02 - anim.p * 0.14; // Internal group shifts with zoom!
   }
   if (DIAPHRAGM_GROUP) {
     DIAPHRAGM_GROUP.scale.setScalar(anim.diaphragmScale);
     DIAPHRAGM_GROUP.rotation.z = anim.diaphragmRot;
   }
 
-  // 5. Dynamic Lighting Intensities
+  // 7. Dynamic Lighting Intensities
   keyLight.intensity = anim.keyIntensity;
   blueRimLight.intensity = anim.blueIntensity;
   goldRimLight.intensity = anim.goldIntensity;
 
-  // 6. Atmospheric Bokeh Drift
+  // 8. Atmospheric Floating Bokeh Drift
   const posAttr = bokehGeo.attributes.position;
   for (let i = 0; i < BOKEH_COUNT; i++) {
     let y = posAttr.getY(i) + bokehSpeeds[i].y;
-    if (y > 3.2) y = -3.2;
+    if (y > 3.6) y = -3.6;
     posAttr.setY(i, y);
 
-    let x = posAttr.getX(i) + Math.sin(time * 0.5 + bokehSpeeds[i].phase) * 0.001;
+    let x = posAttr.getX(i) + Math.sin(time * 0.4 + bokehSpeeds[i].phase) * 0.001;
     posAttr.setX(i, x);
   }
   posAttr.needsUpdate = true;
