@@ -23,7 +23,7 @@
 html { scroll-behavior: auto; }
 
 body {
-  background: rgb(29, 29, 31);
+  background: #0c0c0f;
   color: var(--text);
   font-family: 'Space Grotesk', sans-serif;
   overflow-x: hidden;
@@ -55,7 +55,7 @@ body.show-header-blur::before { opacity: 1; }
 /* ── Canvas Three.js ── */
 #wrap {
   position: fixed; inset: 0; z-index: 1;
-  background: rgb(29, 29, 31);
+  background: #0c0c0f;
 }
 #wrap canvas { display: block; width: 100% !important; height: 100% !important; cursor: crosshair; }
 
