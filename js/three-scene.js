@@ -85,43 +85,43 @@ function createFrontRingTexture() {
 
   // Top Arc: "ESTUDIO EL OSO ◈ CINE PRO MASTER"
   ctx.save();
-  ctx.translate(cx, cy);
-  ctx.font = '600 24px "Space Grotesk", sans-serif';
+  ctx.font = '700 23px "Space Grotesk", sans-serif';
   ctx.fillStyle = '#f0f0f4';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
   const text1 = 'ESTUDIO EL OSO  ◈  CINE PRO MASTER';
   const chars1 = text1.split('');
-  const arcLength1 = Math.PI * 0.82;
-  const startAngle1 = -Math.PI / 2 - arcLength1 / 2;
-  const step1 = arcLength1 / (chars1.length - 1);
+  const arcStart1 = -Math.PI * 0.82;
+  const arcEnd1 = -Math.PI * 0.18;
+  const step1 = (arcEnd1 - arcStart1) / (chars1.length - 1);
+  const textRadius1 = r * 0.82;
 
   chars1.forEach((ch, i) => {
-    const angle = startAngle1 + i * step1;
+    const a = arcStart1 + i * step1;
     ctx.save();
-    ctx.rotate(angle + Math.PI / 2);
-    ctx.translate(0, -r * 0.83);
+    ctx.translate(cx + textRadius1 * Math.cos(a), cy + textRadius1 * Math.sin(a));
+    ctx.rotate(a + Math.PI / 2);
     ctx.fillText(ch, 0, 0);
     ctx.restore();
   });
 
-  // Bottom Arc: "FE 24-70mm F/2.8 · NANO AR COATING · Ø82mm" (Upright, non-reversed!)
-  ctx.font = '500 21px "Space Grotesk", sans-serif';
-  ctx.fillStyle = '#d4a359'; // Warm golden lettering
+  // Bottom Arc: "FE 24-70mm F/2.8 · NANO AR COATING · Ø82mm"
+  ctx.font = '600 20px "Space Grotesk", sans-serif';
+  ctx.fillStyle = '#e8ba60'; // Warm optic gold
 
   const text2 = 'FE 24-70mm F/2.8  ◈  NANO AR COATING  ◈  Ø82mm';
   const chars2 = text2.split('');
-  const arcLength2 = Math.PI * 0.85;
-  const startAngle2 = Math.PI / 2 + arcLength2 / 2;
-  const step2 = arcLength2 / (chars2.length - 1);
+  const arcStart2 = Math.PI * 0.82;
+  const arcEnd2 = Math.PI * 0.18;
+  const step2 = (arcEnd2 - arcStart2) / (chars2.length - 1);
+  const textRadius2 = r * 0.82;
 
   chars2.forEach((ch, i) => {
-    const angle = startAngle2 - i * step2;
+    const a = arcStart2 + i * step2;
     ctx.save();
-    ctx.rotate(angle - Math.PI / 2);
-    ctx.translate(0, -r * 0.83);
-    ctx.rotate(Math.PI); // Rotate 180deg so characters remain upright along bottom arc
+    ctx.translate(cx + textRadius2 * Math.cos(a), cy + textRadius2 * Math.sin(a));
+    ctx.rotate(a - Math.PI / 2);
     ctx.fillText(ch, 0, 0);
     ctx.restore();
   });
@@ -577,10 +577,12 @@ let zoomRingMesh, focusRingMesh, distanceScaleGroup;
   const frontRingMat = new THREE.MeshStandardMaterial({
     map: frontRingTex,
     metalness: 0.85,
-    roughness: 0.28
+    roughness: 0.28,
+    side: THREE.DoubleSide
   });
   const frontRing = new THREE.Mesh(frontRingGeo, frontRingMat);
   frontRing.position.z = 1.81;
+  frontRing.rotation.y = Math.PI;
   LENS_ASSEMBLY.add(frontRing);
 
   // Inner Gold Retaining Ring
