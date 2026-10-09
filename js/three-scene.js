@@ -34,7 +34,7 @@ container.appendChild(renderer.domElement);
 
 /* ── Scene & Atmospheric Depth ── */
 const scene = new THREE.Scene();
-const BG_COLOR = 0x0c0c0f;
+const BG_COLOR = 0x100e0b;
 scene.background = new THREE.Color(BG_COLOR);
 scene.fog = new THREE.FogExp2(BG_COLOR, 0.055);
 
@@ -763,11 +763,15 @@ window.addEventListener('touchmove', e => {
   mouse.y = -(t.clientY / window.innerHeight - 0.5) * 2;
 }, { passive: true });
 
+let resizeDebounceTimer = null;
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
-  if (ScrollTrigger) ScrollTrigger.refresh();
+  clearTimeout(resizeDebounceTimer);
+  resizeDebounceTimer = setTimeout(() => {
+    if (ScrollTrigger) ScrollTrigger.refresh();
+  }, 120);
 });
 
 /* ── Page Load Entrance Animation ── */
@@ -802,7 +806,7 @@ if (gsap && ScrollTrigger && scrollTrack) {
         anim.p = self.progress;
 
         if (elBAR) {
-          elBAR.style.width = (self.progress * 100) + '%';
+          elBAR.style.transform = `scaleX(${self.progress})`;
         }
 
         // Subtitle status updates
@@ -858,14 +862,22 @@ if (gsap && ScrollTrigger && scrollTrack) {
     duration: 1.0
   }, 0);
 
-  // Step 4: Subtle fade of 3D scene at very end of scroll as content appears (85% to 100%)
+  // Step 4: Complete fade of 3D canvas and overlays as content sections appear (85% to 100%)
   scrollTl.to(container, {
-    opacity: 0.25,
+    opacity: 0,
     ease: 'power1.inOut',
     duration: 0.15
   }, 0.85);
 
+  const elGrid = document.getElementById('grid');
+  const elVig = document.getElementById('vig');
+  if (elGrid) scrollTl.to(elGrid, { opacity: 0, ease: 'power1.inOut', duration: 0.15 }, 0.85);
+  if (elVig) scrollTl.to(elVig, { opacity: 0, ease: 'power1.inOut', duration: 0.15 }, 0.85);
+
   // Step 5: Header Brand and Navigation glide in seamlessly (76% to 94%)
+  const elNavToggle = document.getElementById('nav-toggle');
+  const elSiteHeader = document.getElementById('site-header');
+
   if (elBrand) {
     scrollTl.fromTo(elBrand,
       { opacity: 0, y: -16, visibility: 'hidden' },
@@ -888,17 +900,35 @@ if (gsap && ScrollTrigger && scrollTrack) {
       {
         opacity: 1,
         y: 0,
-        visibility: 'visible',
+        visibility: () => window.innerWidth > 768 ? 'visible' : 'hidden',
         ease: 'power2.out',
         duration: 0.18,
         onStart: () => {
-          elNav.style.visibility = 'visible';
+          if (window.innerWidth > 768) elNav.style.visibility = 'visible';
           document.body.classList.add('show-header-blur');
+          if (elSiteHeader) elSiteHeader.classList.add('is-scrolled');
         },
         onReverseComplete: () => {
           elNav.style.visibility = 'hidden';
           document.body.classList.remove('show-header-blur');
+          if (elSiteHeader) elSiteHeader.classList.remove('is-scrolled');
         }
+      },
+      0.78
+    );
+  }
+
+  if (elNavToggle) {
+    scrollTl.fromTo(elNavToggle,
+      { opacity: 0, y: -16, visibility: 'hidden' },
+      {
+        opacity: 1,
+        y: 0,
+        visibility: 'visible',
+        ease: 'power2.out',
+        duration: 0.18,
+        onStart: () => { elNavToggle.style.visibility = 'visible'; },
+        onReverseComplete: () => { elNavToggle.style.visibility = 'hidden'; }
       },
       0.78
     );
