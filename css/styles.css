@@ -795,46 +795,46 @@ body.show-header-blur #wrap {
   max-width: 580px;
 }
 
-.sb-pills {
+.sb-commitments {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 0;
+  border-top: 1px solid var(--color-dark-border);
+  margin-top: 36px;
 }
 
-.sb-pill {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 18px 22px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--color-dark-border);
-  border-radius: var(--radius-md);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: transform var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast);
+.sb-commitment-item {
+  padding: 24px 28px 24px 0;
+  border-bottom: 1px solid var(--color-dark-border-subtle);
+  transition: border-color var(--transition-fast);
 }
 
-.sb-pill:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.22);
-  transform: translateY(-2px);
+.sb-commitment-item:nth-child(even) {
+  padding-left: 28px;
+  padding-right: 0;
+  border-left: 1px solid var(--color-dark-border-subtle);
 }
 
-.pill-icon {
-  color: var(--color-optic-amber);
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pill-text {
+.sb-commitment-title {
   font-family: var(--font-sans);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--color-dark-text-primary);
+  margin-bottom: 6px;
+  transition: color var(--transition-fast);
+}
+
+.sb-commitment-desc {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  font-weight: 300;
+  line-height: 1.55;
+  color: var(--color-dark-text-muted);
+}
+
+.sb-commitment-item:hover .sb-commitment-title {
+  color: var(--color-optic-amber);
 }
 
 /* ── 9. SECTION 03: PROCESO (EDITORIAL LIGHT) ── */
@@ -1635,9 +1635,14 @@ body.show-header-blur #wrap {
   .sb-split { grid-template-columns: 1fr; gap: 48px; }
   .theme-editorial-light .sb-section-header { grid-template-columns: 1fr; gap: 24px; }
   .sb-services-grid { border-top: 1px solid var(--color-light-border); }
-  .sb-service-item { grid-template-columns: 48px 1fr 40px; gap: 20px; padding: 32px 12px; }
-  .sb-pills { grid-template-columns: 1fr; }
-  .sb-cta-heading { font-size: clamp(60px, 15vw, 110px); }
+  .sb-commitments { grid-template-columns: 1fr; }
+  .sb-commitment-item {
+    padding: 20px 0 !important;
+    border-left: none !important;
+  }
+  .sb-commitment-item:nth-child(even) {
+    padding-left: 0 !important;
+  }
   .sb-footer-row { flex-direction: column; gap: 16px; text-align: center; }
 }
 
