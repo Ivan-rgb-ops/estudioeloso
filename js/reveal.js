@@ -39,26 +39,11 @@
 
   // ── Scrolled Past Hero Surface Handler ──
   const siteHeader = document.getElementById('site-header');
-  const brand = document.getElementById('brand');
-  const navEl = document.getElementById('nav');
 
   function updateScrollState() {
     const isPastHero = window.scrollY > (window.innerHeight * 0.7);
-    if (isPastHero) {
-      document.body.classList.add('show-header-blur');
-      if (siteHeader) siteHeader.classList.add('is-scrolled');
-      if (brand && brand.style.opacity !== '1') {
-        brand.style.opacity = '1';
-        brand.style.visibility = 'visible';
-      }
-      if (navEl && window.innerWidth > 768 && navEl.style.opacity !== '1') {
-        navEl.style.opacity = '1';
-        navEl.style.visibility = 'visible';
-      }
-    } else {
-      document.body.classList.remove('show-header-blur');
-      if (siteHeader) siteHeader.classList.remove('is-scrolled');
-    }
+    if (siteHeader) siteHeader.classList.toggle('is-scrolled', isPastHero);
+    document.body.classList.toggle('show-header-blur', isPastHero);
   }
 
   window.addEventListener('scroll', updateScrollState, { passive: true });

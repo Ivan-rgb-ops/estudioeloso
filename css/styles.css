@@ -195,17 +195,6 @@ body.show-header-blur #site-header {
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
 }
 
-body.show-header-blur #hero,
-body.show-header-blur #arr,
-body.show-header-blur #tg,
-body.show-header-blur #grid,
-body.show-header-blur #vig,
-body.show-header-blur #wrap {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
 /* Brand Mark */
 #brand {
   display: flex;

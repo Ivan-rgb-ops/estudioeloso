@@ -795,8 +795,13 @@ if (gsap) {
 }
 
 /* ── GSAP ScrollTrigger Master Timeline (Flawless Scrub with Inertia) ── */
+let scrollTl = null;
+
 if (gsap && ScrollTrigger && scrollTrack) {
-  const scrollTl = gsap.timeline({
+  const elGrid = document.getElementById('grid');
+  const elVig = document.getElementById('vig');
+
+  scrollTl = gsap.timeline({
     scrollTrigger: {
       trigger: scrollTrack,
       start: 'top top',
@@ -807,6 +812,21 @@ if (gsap && ScrollTrigger && scrollTrack) {
 
         if (elBAR) {
           elBAR.style.transform = `scaleX(${self.progress})`;
+        }
+
+        // Direct, bulletproof opacity management for 3D container and overlays
+        if (self.progress >= 0.85) {
+          const fadeP = (self.progress - 0.85) / 0.15;
+          const op = Math.max(0, 1 - fadeP);
+          container.style.opacity = op;
+          container.style.visibility = op <= 0 ? 'hidden' : 'visible';
+          if (elGrid) { elGrid.style.opacity = op; elGrid.style.visibility = op <= 0 ? 'hidden' : 'visible'; }
+          if (elVig) { elVig.style.opacity = op; elVig.style.visibility = op <= 0 ? 'hidden' : 'visible'; }
+        } else {
+          container.style.opacity = '1';
+          container.style.visibility = 'visible';
+          if (elGrid) { elGrid.style.opacity = '1'; elGrid.style.visibility = 'visible'; }
+          if (elVig) { elVig.style.opacity = '1'; elVig.style.visibility = 'visible'; }
         }
 
         // Subtitle status updates
@@ -820,59 +840,87 @@ if (gsap && ScrollTrigger && scrollTrack) {
             elST.textContent = 'EL MOMENTO'; elSS.textContent = 'Congelado para siempre'; elTG.textContent = 'Estudio El Oso';
           }
         }
+      },
+      onLeave: () => {
+        container.style.opacity = '0';
+        container.style.visibility = 'hidden';
+        if (elGrid) { elGrid.style.opacity = '0'; elGrid.style.visibility = 'hidden'; }
+        if (elVig) { elVig.style.opacity = '0'; elVig.style.visibility = 'hidden'; }
+      },
+      onEnterBack: () => {
+        container.style.opacity = '1';
+        container.style.visibility = 'visible';
+        if (elGrid) { elGrid.style.opacity = '1'; elGrid.style.visibility = 'visible'; }
+        if (elVig) { elVig.style.opacity = '1'; elVig.style.visibility = 'visible'; }
+      },
+      onLeaveBack: () => {
+        container.style.opacity = '1';
+        container.style.visibility = 'visible';
+        if (elGrid) { elGrid.style.opacity = '1'; elGrid.style.visibility = 'visible'; }
+        if (elVig) { elVig.style.opacity = '1'; elVig.style.visibility = 'visible'; }
+        if (elHero) { elHero.style.opacity = '1'; elHero.style.visibility = 'visible'; }
       }
     }
   });
 
   // Step 1: Hero text smoothly lifts, scales, and dissolves (0% to 24%)
   if (elHero) {
-    scrollTl.to(elHero, {
-      opacity: 0,
-      y: -50,
-      scale: 0.92,
-      ease: 'power2.inOut',
-      duration: 0.24
-    }, 0);
+    scrollTl.fromTo(elHero,
+      { opacity: 1, y: 0, scale: 1 },
+      {
+        opacity: 0,
+        y: -50,
+        scale: 0.92,
+        ease: 'power2.inOut',
+        duration: 0.24
+      },
+      0
+    );
   }
 
   // Scroll arrow and hint fade out early (0% to 14%)
-  if (elARR) scrollTl.to(elARR, { opacity: 0, y: 12, ease: 'power1.out', duration: 0.14 }, 0);
-  if (elTG) scrollTl.to(elTG, { opacity: 0, y: 10, ease: 'power1.out', duration: 0.14 }, 0);
+  if (elARR) scrollTl.fromTo(elARR, { opacity: 1, y: 0 }, { opacity: 0, y: 12, ease: 'power1.out', duration: 0.14 }, 0);
+  if (elTG) scrollTl.fromTo(elTG, { opacity: 1, y: 0 }, { opacity: 0, y: 10, ease: 'power1.out', duration: 0.14 }, 0);
 
   // Step 2: Camera pivots from beauty 3/4 view to align front-and-center (0% to 45%)
-  scrollTl.to(anim, {
-    rigRotY: 0,
-    rigRotX: 0,
-    ease: 'power2.out',
-    duration: 0.45
-  }, 0);
+  scrollTl.fromTo(anim,
+    { rigRotY: -0.42, rigRotX: 0.14 },
+    {
+      rigRotY: 0,
+      rigRotX: 0,
+      ease: 'power2.out',
+      duration: 0.45
+    },
+    0
+  );
 
   // Step 3: Macro Push into the Lens Barrel & Kinematics (0% to 100%)
   // Safely zooms close to front element (from z:6.2 to z:2.05) without clipping inside!
-  scrollTl.to(anim, {
-    camZ: 2.05,
-    focusRot: Math.PI * 1.5, // Focus ring visibly spins
-    zoomRot: Math.PI * 0.5,
-    diaphragmScale: 0.76, // Diaphragm constricts realistically down to f/5.6
-    diaphragmRot: Math.PI * 0.3,
-    keyIntensity: 4.8,
-    blueIntensity: 5.5,
-    goldIntensity: 4.2,
-    ease: 'power2.inOut',
-    duration: 1.0
-  }, 0);
-
-  // Step 4: Complete fade of 3D canvas and overlays as content sections appear (85% to 100%)
-  scrollTl.to(container, {
-    opacity: 0,
-    ease: 'power1.inOut',
-    duration: 0.15
-  }, 0.85);
-
-  const elGrid = document.getElementById('grid');
-  const elVig = document.getElementById('vig');
-  if (elGrid) scrollTl.to(elGrid, { opacity: 0, ease: 'power1.inOut', duration: 0.15 }, 0.85);
-  if (elVig) scrollTl.to(elVig, { opacity: 0, ease: 'power1.inOut', duration: 0.15 }, 0.85);
+  scrollTl.fromTo(anim,
+    {
+      camZ: 6.2,
+      focusRot: 0,
+      zoomRot: 0,
+      diaphragmScale: 1.0,
+      diaphragmRot: 0,
+      keyIntensity: 3.4,
+      blueIntensity: 4.2,
+      goldIntensity: 3.2
+    },
+    {
+      camZ: 2.05,
+      focusRot: Math.PI * 1.5, // Focus ring visibly spins
+      zoomRot: Math.PI * 0.5,
+      diaphragmScale: 0.76, // Diaphragm constricts realistically down to f/5.6
+      diaphragmRot: Math.PI * 0.3,
+      keyIntensity: 4.8,
+      blueIntensity: 5.5,
+      goldIntensity: 4.2,
+      ease: 'power2.inOut',
+      duration: 1.0
+    },
+    0
+  );
 
   // Step 5: Header Brand and Navigation glide in seamlessly (76% to 94%)
   const elNavToggle = document.getElementById('nav-toggle');
@@ -933,11 +981,37 @@ if (gsap && ScrollTrigger && scrollTrack) {
       0.78
     );
   }
+
+  // Bulletproof failsafe: when user scrolls back to top, ensure 3D container & hero are 100% visible
+  window.addEventListener('scroll', () => {
+    if (window.scrollY <= 20) {
+      if (container) {
+        container.style.opacity = '1';
+        container.style.visibility = 'visible';
+      }
+      if (elGrid) {
+        elGrid.style.opacity = '1';
+        elGrid.style.visibility = 'visible';
+      }
+      if (elVig) {
+        elVig.style.opacity = '1';
+        elVig.style.visibility = 'visible';
+      }
+      if (elHero) {
+        elHero.style.opacity = '1';
+        elHero.style.visibility = 'visible';
+      }
+    }
+  }, { passive: true });
 }
 
-/* ════════════════════════════════════════════════════════════════
-   RENDER LOOP (60FPS Physics, Parallax & Atmosphere)
-   ════════════════════════════════════════════════════════════════ */
+window.__DEBUG = {
+  anim,
+  camera,
+  MASTER_RIG,
+  container,
+  scrollTl
+};
 
 const clock = new THREE.Clock();
 
