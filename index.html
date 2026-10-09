@@ -2,199 +2,300 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Estudio El Oso — Photography</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estudio El Oso — Fotografía Cinematográfica y Cobertura de Eventos</title>
+  <meta name="description" content="Estudio El Oso — Fotografía y video cinematográfico para eventos deportivos, fútbol infantil, cumpleaños familiares y ocasiones únicas. Cada foto cuenta." />
+  
+  <!-- Open Graph / Meta Social -->
+  <meta property="og:title" content="Estudio El Oso — Fotografía Cinematográfica" />
+  <meta property="og:description" content="Capturamos momentos irrepetibles con estándar editorial y pasión cinematográfica." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0c0c0f" />
 
-  <!-- Fonts -->
+  <!-- Google Fonts: Bebas Neue + Space Grotesk (Full Font-Weights) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="css/styles.css?v=2" />
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css?v=6" />
 </head>
 <body>
 
-  <!-- Progress bar -->
-  <div id="bar"></div>
+  <!-- Progress bar (GPU-accelerated scaleX) -->
+  <div id="bar" role="progressbar" aria-label="Progreso de página"></div>
 
   <!-- Background grid overlay -->
-  <div id="grid"></div>
+  <div id="grid" aria-hidden="true"></div>
 
-  <!-- Vignette overlay -->
-  <div id="vig"></div>
+  <!-- Atmospheric vignette overlay -->
+  <div id="vig" aria-hidden="true"></div>
 
   <!-- Three.js canvas container -->
-  <div id="wrap"></div>
+  <div id="wrap" aria-hidden="true"></div>
 
-  <!-- ── Header ── -->
-  <div id="brand">
-    <div class="bear-icon">◈</div>
-    Estudio El Oso <em>/</em> Photography
-  </div>
+  <!-- ── Master Site Header ── -->
+  <header id="site-header">
+    <div class="header-container">
+      <a href="#" id="brand" class="brand-link" aria-label="Estudio El Oso - Inicio">
+        <span class="bear-icon" aria-hidden="true">◈</span>
+        <span class="brand-name">Estudio El Oso <span class="brand-sep">/</span> <span class="brand-sub">Photography</span></span>
+      </a>
 
-  <nav id="nav">
-    <a href="#servicios">Servicios</a>
-    <a href="#nosotros">Nosotros</a>
-    <a href="#proceso">Proceso</a>
-    <a href="album-futbol.html" target="_blank" rel="noopener">Fútbol ↗</a>
-    <a href="#contacto">Contacto</a>
-  </nav>
+      <!-- Mobile Navigation Hamburger Toggle -->
+      <button id="nav-toggle" class="nav-toggle" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="nav">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+      </button>
 
-  <!-- ── Hero (fixed, fades out on scroll) ── -->
+      <!-- Main Navigation Menu -->
+      <nav id="nav" aria-label="Navegación principal">
+        <a href="#servicios" class="nav-link">Servicios</a>
+        <a href="#nosotros" class="nav-link">Nosotros</a>
+        <a href="#proceso" class="nav-link">Proceso</a>
+        <a href="album-futbol.html" target="_blank" rel="noopener" class="nav-link nav-link-badge">
+          Fútbol <span>↗</span>
+        </a>
+        <a href="#contacto" class="nav-link nav-link-cta">Contacto</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Hero (Fixed 3D Viewport Title) ── -->
   <div id="hero">
-    <div class="eyebrow">Cada momento, para siempre</div>
-    <h1>Estudio<span>el oso
-    </span></h1>
+    <div class="eyebrow">◈ Cine Optics & Event Photography</div>
+    <h1>ESTUDIO <span>EL OSO</span></h1>
     <p>Fotografía de eventos · Familias · Fútbol · Cumpleaños</p>
-    <div class="hint">Scroll para comenzar</div>
+    <div class="hint">Scroll para explorar</div>
   </div>
 
-  <!-- ── Bottom-left info ── -->
-  <div id="si">
+  <!-- ── Bottom-left status info ── -->
+  <div id="si" aria-hidden="true">
     <div id="st">ESTUDIO EL OSO</div>
     <div id="ss">Photography</div>
   </div>
 
-  <!-- ── Bottom-right tagline ── -->
-  <div id="tg">Scroll para acercarte</div>
+  <!-- ── Bottom-right interactive tagline ── -->
+  <div id="tg" aria-hidden="true">Scroll para acercarte</div>
 
-  <!-- ── Scroll arrow ── -->
-  <div id="arr">
+  <!-- ── Animated Scroll Arrow ── -->
+  <div id="arr" aria-hidden="true">
     <div class="ln"></div>
     <div class="ch"></div>
   </div>
 
-  <!-- Scroll distance driver (400vh) -->
-  <div id="scroll-track"></div>
+  <!-- Scroll distance driver for 3D Camera Kinematics -->
+  <div id="scroll-track" aria-hidden="true"></div>
 
   <!-- ══════════════════════════════════════════
-       CONTENT SECTIONS
+       MAIN CONTENT SECTIONS
   ══════════════════════════════════════════ -->
-  <div id="content-sections">
+  <main id="content-sections">
 
-    <!-- 01 · Servicios -->
-    <section class="sb-section sb-dark" id="servicios">
+    <!-- 01 · Servicios (Editorial Light) -->
+    <section class="sb-section theme-editorial-light" id="servicios">
       <div class="sb-container">
+        
         <div class="sb-label">
           <span class="sb-num">01</span>
           <span class="sb-rule"></span>
-          <span class="sb-tag">Servicios</span>
+          <span class="sb-tag">Servicios Especializados</span>
         </div>
-        <h2 class="sb-heading-large">Lo que<br><em>hacemos</em></h2>
-                <div class="sb-services-grid">
 
-          <a class="sb-service-item sb-service-link" data-sb-reveal href="album-futbol.html" target="_blank" rel="noopener">
+        <div class="sb-section-header">
+          <h2 class="sb-heading-large">Lo que<br><em>hacemos.</em></h2>
+          <p class="sb-header-intro">
+            Capturamos la autenticidad y energía de cada ocasión con equipos de nivel cinematográfico, óptica prime y un ojo documental que no deja escapar ningún detalle.
+          </p>
+        </div>
+
+        <div class="sb-services-grid">
+
+          <!-- 01: Fútbol Infantil (Destacado) -->
+          <a class="sb-service-item sb-service-link is-featured" data-sb-reveal href="album-futbol.html" target="_blank" rel="noopener">
             <div class="sb-service-num">01</div>
             <div class="sb-service-body">
               <div class="sb-service-title">Fútbol infantil</div>
-              <div class="sb-service-desc">Capturamos cada gol, cada festejo, cada abrazo en la cancha. Fotos y videos del partido completo.</div>
-              <div class="sb-service-tag">Deporte · Acción · Emoción</div>
+              <div class="sb-service-desc">Capturamos cada gol, cada festejo y cada abrazo en la cancha. Cobertura dinámica en alta velocidad con fotos y videos del partido completo.</div>
+              <div class="sb-service-badges">
+                <span class="sb-badge">Deporte</span>
+                <span class="sb-badge">Acción</span>
+                <span class="sb-badge">Galería por Camiseta</span>
+              </div>
             </div>
-            <div class="sb-service-arrow">↗</div>
+            <div class="sb-service-arrow-wrap">
+              <span class="sb-service-arrow">↗</span>
+            </div>
           </a>
 
+          <!-- 02: Cumpleaños -->
           <div class="sb-service-item" data-sb-reveal>
             <div class="sb-service-num">02</div>
             <div class="sb-service-body">
               <div class="sb-service-title">Cumpleaños</div>
-              <div class="sb-service-desc">Desde la torta hasta la última vela. Momentos únicos que merecen ser recordados para siempre.</div>
-              <div class="sb-service-tag">Familia · Celebración · Recuerdos</div>
+              <div class="sb-service-desc">Desde la espontaneidad de los juegos hasta el momento de la torta y las velas. Recuerdos imborrables que perduran en el tiempo.</div>
+              <div class="sb-service-badges">
+                <span class="sb-badge">Familia</span>
+                <span class="sb-badge">Celebración</span>
+                <span class="sb-badge">Momentos Únicos</span>
+              </div>
             </div>
-            <div class="sb-service-arrow">↗</div>
+            <div class="sb-service-arrow-wrap">
+              <span class="sb-service-arrow">↗</span>
+            </div>
           </div>
 
+          <!-- 03: Eventos Familiares -->
           <div class="sb-service-item" data-sb-reveal>
             <div class="sb-service-num">03</div>
             <div class="sb-service-body">
               <div class="sb-service-title">Eventos familiares</div>
-              <div class="sb-service-desc">Reuniones, bautismos, comuniones y toda celebración que merezca quedar en fotos.</div>
-              <div class="sb-service-tag">Familia · Tradición · Amor</div>
+              <div class="sb-service-desc">Reuniones, aniversarios, bautismos y comuniones. Un registro cercano, respetuoso y sensible con la intimidad de tu hogar.</div>
+              <div class="sb-service-badges">
+                <span class="sb-badge">Tradición</span>
+                <span class="sb-badge">Afecto</span>
+                <span class="sb-badge">Cobertura Documental</span>
+              </div>
             </div>
-            <div class="sb-service-arrow">↗</div>
+            <div class="sb-service-arrow-wrap">
+              <span class="sb-service-arrow">↗</span>
+            </div>
           </div>
 
+          <!-- 04: Eventos Especiales -->
           <div class="sb-service-item" data-sb-reveal>
             <div class="sb-service-num">04</div>
             <div class="sb-service-body">
               <div class="sb-service-title">Eventos especiales</div>
-              <div class="sb-service-desc">Casamientos, egresados, actos escolares. Cobertura completa desde el principio hasta el final.</div>
-              <div class="sb-service-tag">Ceremonia · Cobertura · Arte</div>
+              <div class="sb-service-desc">Casamientos, colaciones y galas escolares. Dirección fotográfica integral con estética editorial y entrega en máxima resolución.</div>
+              <div class="sb-service-badges">
+                <span class="sb-badge">Ceremonia</span>
+                <span class="sb-badge">Gala</span>
+                <span class="sb-badge">Cinematic Video</span>
+              </div>
             </div>
-            <div class="sb-service-arrow">↗</div>
+            <div class="sb-service-arrow-wrap">
+              <span class="sb-service-arrow">↗</span>
+            </div>
           </div>
 
-        </div>      </div>
+        </div>
+      </div>
     </section>
 
-    <!-- 02 · Por qué nosotros -->
-    <section class="sb-section sb-light" id="nosotros">
+    <!-- 02 · Manifiesto / Por qué nosotros (Cinematic Dark) -->
+    <section class="sb-section theme-cinematic-dark" id="nosotros">
       <div class="sb-container">
+        
         <div class="sb-label">
           <span class="sb-num">02</span>
           <span class="sb-rule"></span>
-          <span class="sb-tag">ESTUDIO EL OSO</span>
+          <span class="sb-tag">Manifiesto & Compromiso</span>
         </div>
+
         <div class="sb-split">
-          <div class="sb-split-left">
+          <div class="sb-split-left" data-sb-reveal>
             <h2 class="sb-heading-large">Cada<br>foto<br><em>cuenta.</em></h2>
+            <div class="sb-lens-tag">
+              <span class="lens-dot"></span>
+              <span>24-70mm F/2.8 · NANO AR COATING</span>
+            </div>
           </div>
-          <div class="sb-split-right">
-            <p class="sb-body-text">No somos un estudio genérico. Somos fotógrafos que aman los eventos reales — el barro en las rodillas de un partido de fútbol, las carcajadas de una mesa familiar, las lágrimas de emoción en un festejo.</p>
+          
+          <div class="sb-split-right" data-sb-reveal>
+            <p class="sb-body-text">
+              No somos un estudio genérico ni producimos fotos posadas de catálogo. Somos fotógrafos que aman los eventos reales: el barro en las rodillas de un partido de fútbol, las carcajadas de una mesa familiar compartida y las lágrimas de emoción sincera en un festejo.
+            </p>
+            <p class="sb-body-subtext">
+              Trabajamos con óptica cinematográfica de alta apertura y procesado color profesional para que cada toma conserve la atmósfera viva del instante.
+            </p>
+
             <div class="sb-pills">
-              <span class="sb-pill">Entrega rápida</span>
-              <span class="sb-pill">Alta resolución</span>
-              <span class="sb-pill">Galería online</span>
-              <span class="sb-pill">Video incluido</span>
+              <div class="sb-pill">
+                <span class="pill-icon">⚡</span>
+                <span class="pill-text">Entrega en 48hs</span>
+              </div>
+              <div class="sb-pill">
+                <span class="pill-icon">✦</span>
+                <span class="pill-text">Alta resolución RAW</span>
+              </div>
+              <div class="sb-pill">
+                <span class="pill-icon">◈</span>
+                <span class="pill-text">Galería online privada</span>
+              </div>
+              <div class="sb-pill">
+                <span class="pill-icon">▶</span>
+                <span class="pill-text">Video en 4K UHD</span>
+              </div>
             </div>
           </div>
         </div>
+
       </div>
     </section>
 
-    <!-- 03 · Proceso -->
-    <section class="sb-section sb-dark" id="proceso">
+    <!-- 03 · Proceso (Editorial Light) -->
+    <section class="sb-section theme-editorial-light" id="proceso">
       <div class="sb-container">
+        
         <div class="sb-label">
           <span class="sb-num">03</span>
           <span class="sb-rule"></span>
-          <span class="sb-tag">Proceso</span>
+          <span class="sb-tag">Metodología de Trabajo</span>
         </div>
-        <h2 class="sb-heading-med">Simple y sin vueltas</h2>
+
+        <div class="sb-process-header">
+          <h2 class="sb-heading-med">Simple y sin vueltas</h2>
+          <p class="sb-process-intro">Una experiencia transparente desde el primer mensaje hasta la entrega final de tu galería.</p>
+        </div>
+
         <div class="sb-steps">
 
           <div class="sb-step" data-sb-reveal>
-            <div class="sb-step-line"></div>
+            <div class="sb-step-marker">
+              <div class="sb-step-node"></div>
+              <div class="sb-step-line"></div>
+            </div>
             <div class="sb-step-num">01</div>
             <div class="sb-step-content">
               <div class="sb-step-title">Nos contactás</div>
-              <div class="sb-step-desc">Contanos tu evento — fecha, lugar y qué querés que capturemos. Te respondemos en menos de 24hs.</div>
+              <div class="sb-step-desc">Contanos la fecha, el lugar y qué tipo de cobertura necesitás. Te respondemos de inmediato con presupuesto claro y sin sorpresas.</div>
             </div>
           </div>
 
           <div class="sb-step" data-sb-reveal>
-            <div class="sb-step-line"></div>
+            <div class="sb-step-marker">
+              <div class="sb-step-node"></div>
+              <div class="sb-step-line"></div>
+            </div>
             <div class="sb-step-num">02</div>
             <div class="sb-step-content">
-              <div class="sb-step-title">Coordinamos</div>
-              <div class="sb-step-desc">Hablamos de los detalles, acordamos el paquete que mejor se adapta y confirmamos la fecha.</div>
+              <div class="sb-step-title">Coordinamos los detalles</div>
+              <div class="sb-step-desc">Ajustamos los horarios clave, la lista de tomas imprescindibles y aseguramos la fecha de tu evento en nuestra agenda oficial.</div>
             </div>
           </div>
 
           <div class="sb-step" data-sb-reveal>
-            <div class="sb-step-line"></div>
+            <div class="sb-step-marker">
+              <div class="sb-step-node"></div>
+              <div class="sb-step-line"></div>
+            </div>
             <div class="sb-step-num">03</div>
             <div class="sb-step-content">
               <div class="sb-step-title">El día del evento</div>
-              <div class="sb-step-desc">Llegamos antes, nos movemos con discreción y capturamos cada momento importante sin interrumpir.</div>
+              <div class="sb-step-desc">Llegamos con anticipación técnica, trabajamos con total discreción y capturamos cada emoción de forma natural sin interrumpir la vivencia.</div>
             </div>
           </div>
 
           <div class="sb-step" data-sb-reveal>
-            <div class="sb-step-line"></div>
+            <div class="sb-step-marker">
+              <div class="sb-step-node"></div>
+              <div class="sb-step-line"></div>
+            </div>
             <div class="sb-step-num">04</div>
             <div class="sb-step-content">
-              <div class="sb-step-title">Recibís tus fotos</div>
-              <div class="sb-step-desc">En 48 horas tenés acceso a tu galería online editada y lista para descargar y compartir.</div>
+              <div class="sb-step-title">Recibís tus fotos editadas</div>
+              <div class="sb-step-desc">En 48 horas recibís el enlace a tu galería online interactiva, optimizada para visualizar, descargar en máxima definición y compartir en un clic.</div>
             </div>
           </div>
 
@@ -202,31 +303,57 @@
       </div>
     </section>
 
-    <!-- 04 · CTA / Contacto -->
-    <section class="sb-section sb-cta" id="contacto">
-      <div class="sb-container sb-cta-inner">
-        <div class="sb-cta-eyebrow">¿Tenés un evento?</div>
-        <h2 class="sb-cta-heading">Hablemos<br><em>hoy.</em></h2>
-        <p class="sb-cta-sub">Contanos tu fecha y te armamos una propuesta sin compromiso.</p>
-        <a href="https://wa.me/5493412524472?text=Hola%20Estudio%20El%20Oso,%20quiero%20hacer%20una%20consulta%20por%20fotograf%C3%ADa%20de%20un%20evento" class="sb-cta-btn" target="_blank" rel="noopener">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-          </svg>
-          Escribinos por WhatsApp
-        </a>
-        <div class="sb-footer-row">
-          <div class="sb-footer-brand">◈ Estudio El Oso</div>
-          <div class="sb-footer-copy">Photography · Cada momento, para siempre</div>
+    <!-- 04 · CTA Final & Contacto (Aura Gradient: Nightfall) -->
+    <section class="sb-section sb-cta aura-nightfall" id="contacto">
+      <!-- Atmospheric Layers (pointer-events: none) -->
+      <div class="aura-layer aura-layer-1" aria-hidden="true"></div>
+      <div class="aura-layer aura-layer-2" aria-hidden="true"></div>
+      <div class="aura-layer aura-layer-3" aria-hidden="true"></div>
+      <div class="aura-grain" aria-hidden="true">
+        <svg width="100%" height="100%" preserveAspectRatio="none">
+          <filter id="aura-noise">
+            <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="4" stitchTiles="stitch" />
+          </filter>
+          <rect width="100%" height="100%" filter="url(#aura-noise)" />
+        </svg>
+      </div>
+
+      <!-- Real Content Wrapped (position: relative; z-index: 1) -->
+      <div class="sb-container sb-cta-inner aura-content">
+        
+        <div class="sb-cta-badge" data-sb-reveal>¿Tenés una fecha en mente?</div>
+        
+        <h2 class="sb-cta-heading" data-sb-reveal>Hablemos<br><em>hoy.</em></h2>
+        
+        <p class="sb-cta-sub" data-sb-reveal>
+          Escribinos directamente para consultar disponibilidad o contarnos los detalles de tu evento. Te respondemos en el día.
+        </p>
+
+        <div class="sb-cta-actions" data-sb-reveal>
+          <a href="https://wa.me/5493412524472?text=Hola%20Estudio%20El%20Oso,%20quiero%20hacer%20una%20consulta%20por%20fotograf%C3%ADa%20de%20un%20evento" class="sb-cta-btn" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            <span>Escribinos por WhatsApp</span>
+          </a>
         </div>
+
+        <footer class="sb-footer-row">
+          <div class="sb-footer-brand">
+            <span class="bear-icon" aria-hidden="true">◈</span>
+            <span>Estudio El Oso</span>
+          </div>
+          <div class="sb-footer-copy">Photography & Film · Rosario, Argentina · Cada momento, para siempre</div>
+        </footer>
+
       </div>
     </section>
 
-  </div><!-- /#content-sections -->
-
+  </main><!-- /#content-sections -->
 
   <!-- ── Scripts ── -->
 
-  <!-- GSAP & ScrollTrigger -->
+  <!-- GSAP & ScrollTrigger Core -->
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 
@@ -236,10 +363,10 @@
   </script>
 
   <!-- 3D lens scene (ES module) -->
-  <script type="module" src="js/three-scene.js?v=5"></script>
+  <script type="module" src="js/three-scene.js?v=6"></script>
 
-  <!-- Scroll reveal (classic script, runs after DOM ready) -->
-  <script src="js/reveal.js?v=2" defer></script>
+  <!-- Scroll reveal and UI Interactions (defer) -->
+  <script src="js/reveal.js?v=6" defer></script>
 
 </body>
 </html>
